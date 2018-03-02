@@ -6,6 +6,7 @@ import model.MapModel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -13,12 +14,11 @@ public class DrawingCanvas extends JPanel implements Observer {
 
     private MapModel mapModel;
     private DrawModel drawModel;
-    Dimension d;
 
     public DrawingCanvas(MapModel mm, DrawModel dm){
         this.mapModel  = mm;
         this.drawModel = dm;
-        mapModel.initKernel(0, 0, Math.min(getSize().width, getSize().height));
+        mapModel.initKernel(0, 0, Integer.MAX_VALUE); // Maximize the size of the kernel, show the whole map
     }
 
     @Override
@@ -26,6 +26,17 @@ public class DrawingCanvas extends JPanel implements Observer {
         super.paintComponent(g);
 
         Dimension d = getSize();
+        if(mapModel.isLoading()){
+            g.setColor(new Color(0, 0, 0));
+            g.fillRect(0, 0, d.width, d.height);
+            BufferedImage loadingKernel = mapModel.getKernel();
+            g.drawImage(loadingKernel,
+                    (d.width / 2) - loadingKernel.getWidth() / 2,
+                    (d.height / 2) - loadingKernel.getHeight() / 2,
+                    loadingKernel.getWidth(), loadingKernel.getHeight(), null);
+            return;
+        }
+
         int squareDimension = Math.min(d.width, d.height);
         g.drawImage(mapModel.getKernel(), 0, 0, squareDimension, squareDimension, null);
 

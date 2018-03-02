@@ -18,10 +18,20 @@ public class MapScrollListener implements MouseWheelListener{
      * is a maximum granularity in both small and large sizes that the model manages. Otherwise
      * the scaling is exponential. */
     public void mouseWheelMoved(MouseWheelEvent e) {
+        int mouseX = e.getX(), mouseY = e.getY();
+        int oldKernelSize = mapModel.getKernelSize();
+        int smaller = (int) (oldKernelSize * 1.5);
+        int larger =  (int) (oldKernelSize / 1.5);
         if(e.getWheelRotation() < 0){
-            mapModel.updateKernelSize( (int) (mapModel.getKernelSize() / 1.5) );
+//            int delta = oldKernelSize - larger;
+//            mapModel.updateKernelX(mapModel.getKernelX() + (delta / 2) );
+//            mapModel.updateKernelY(mapModel.getKernelY() + (delta / 2) );
+
+
+            mapModel.updateKernelSize(larger);
         }else{
-            mapModel.updateKernelSize( (int) (mapModel.getKernelSize() * 1.5) );
+
+            mapModel.updateKernelSize(smaller);
         }
     }
 }

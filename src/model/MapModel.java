@@ -3,19 +3,41 @@ package model;
 import com.sun.istack.internal.NotNull;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
+import javax.swing.*;
+import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Observable;
 
 public class MapModel extends Observable {
     private static final int SIZE = 8192;
     private static final int MIN_KERNEL_SIZE = 400;
     private static final HashMap<Integer, String> supportedMaps = new HashMap<>();
-    public static final Integer MAP_DEFAULT = 1, MAP_GIS = 2, MAP_TOPO = 3;
+    public static final int MAP_DEFAULT = 1, MAP_GIS = 2, MAP_TOPO = 3;
+
+    /* Cache each of the backgrounds in memory to prevent long delays when switching between the maps. */
+    private static BufferedImage cachedDefault = null, cachedGis = null, cachedTopo = null;
+    private static BufferedImage loadingRing = null;
+    private boolean loading = true;
+    private int loadingKernelX = 0, loadingKernelY = 0, loadingKernelSize = 128;
+    Timer ringAnimator = null;
+    private class BackgroundCacher extends Thread {
+        private int desired;
+        public BackgroundCacher(int desiredBackground){
+            this.desired = desiredBackground;
+        }
+        public void run(){
+            cacheBackground(MAP_DEFAULT);
+            cacheBackground(MAP_GIS);
+            cacheBackground(MAP_TOPO);
+
+            setMap(desired);
+            loading = false;
+            ringAnimator.stop();
+        }
+    }
 
     @NotNull
     private BufferedImage mapImage = new BufferedImage(SIZE, SIZE, BufferedImage.TYPE_INT_RGB);
@@ -24,25 +46,65 @@ public class MapModel extends Observable {
     /* The kernel is the actively viewable part of the map that is being displayed by the view */
     private int kernelX, kernelY, kernelSize;
 
-    public MapModel(Integer selected){
+    public MapModel(Integer selected) {
         supportedMaps.put(MAP_DEFAULT, "erangel.jpg");
-        supportedMaps.put(MAP_GIS,     "erangel-gis.jpg");
-        supportedMaps.put(MAP_TOPO,    "erangel-topo.jpg");
+        supportedMaps.put(MAP_GIS, "erangel-gis.jpg");
+        supportedMaps.put(MAP_TOPO, "erangel-topo.jpg");
 
-        assert(supportedMaps.containsKey(selected));
-        this.selectedMap = selected;
-        loadBackground(selected);
+        assert (supportedMaps.containsKey(selected));
+
+        ringAnimator = new Timer(200, (ActionEvent e) -> {
+            if(loadingRing == null){
+                try{
+                    loadingRing = ImageIO.read(new File("res/loading.png"));
+                }catch(IOException ex){
+                    System.err.printf("The loading ring 'res/%s' could not be loaded.\n", "res/loading.png");
+                    loadingRing = new BufferedImage(1, 1, BufferedImage.TYPE_BYTE_GRAY);
+                }
+            }
+            loadingKernelX = (loadingKernelX + 128) % (12 * 128); //animation frames 0, 1, 2, 3, 4, 5
+            setChanged();
+            notifyObservers();
+        });
+        ringAnimator.start();
+
+        BackgroundCacher bc = new BackgroundCacher(selected);
+        bc.start();
 
         kernelSize = kernelX = kernelY = -1;
     }
 
-    private void loadBackground(Integer selected){
-        String mapPath = "res/" + supportedMaps.get(selectedMap);
-        try{
-            mapImage = ImageIO.read(new File(mapPath));
-        }catch(IOException e){
-            System.err.printf("The image 'res/%s' could not be loaded.\n", mapPath);
-            mapImage = new BufferedImage(SIZE, SIZE, BufferedImage.TYPE_INT_RGB);
+    private static void cacheBackground(int selected){
+        String mapPath = "res/" + supportedMaps.get(selected);
+        switch(selected){
+            case MAP_DEFAULT:
+                try{
+                    cachedDefault = ImageIO.read(new File(mapPath));
+                }catch(IOException e){
+                    System.err.printf("The default map 'res/%s' could not be loaded.\n", mapPath);
+                    cachedDefault = new BufferedImage(SIZE, SIZE, BufferedImage.TYPE_INT_RGB);
+                }
+                break;
+            case MAP_GIS:
+                try{
+                    cachedGis = ImageIO.read(new File(mapPath));
+                }catch(IOException e){
+                    System.err.printf("The GIS map 'res/%s' could not be loaded.\n", mapPath);
+                    cachedGis = new BufferedImage(SIZE, SIZE, BufferedImage.TYPE_INT_RGB);
+                }
+                break;
+
+            case MAP_TOPO:
+                try{
+                    cachedTopo = ImageIO.read(new File(mapPath));
+                }catch(IOException e){
+                    System.err.printf("The topology map 'res/%s' could not be loaded.\n", mapPath);
+                    cachedTopo = new BufferedImage(SIZE, SIZE, BufferedImage.TYPE_INT_RGB);
+                }
+                break;
+
+            default:
+                System.err.println("Unknown selected map type: " + selected);
         }
     }
 
@@ -53,8 +115,20 @@ public class MapModel extends Observable {
     public void setMap(Integer newMap){
         assert(supportedMaps.containsKey(newMap));
 
-        this.selectedMap = newMap;
-        loadBackground(newMap);
+        selectedMap = newMap;
+        switch(selectedMap){
+            case MAP_DEFAULT:
+                mapImage = cachedDefault;
+                break;
+            case MAP_GIS:
+                mapImage = cachedGis;
+                break;
+            case MAP_TOPO:
+                mapImage = cachedTopo;
+                break;
+            default:
+                System.err.println("Unknown selected map type: " + selectedMap);
+        }
         setChanged();
         notifyObservers();
     }
@@ -68,6 +142,10 @@ public class MapModel extends Observable {
     }
 
     public BufferedImage getKernel(){
+        if(loading && loadingRing != null){
+            return loadingRing.getSubimage(loadingKernelX, loadingKernelY, loadingKernelSize, loadingKernelSize);
+        }
+
         if(kernelInitialized())
             return mapImage.getSubimage(kernelX, kernelY, kernelSize, kernelSize);
         else
@@ -167,5 +245,9 @@ public class MapModel extends Observable {
 
     public int getKernelSize() {
         return kernelSize;
+    }
+
+    public boolean isLoading(){
+        return loading;
     }
 }
