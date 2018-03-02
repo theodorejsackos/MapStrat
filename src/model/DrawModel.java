@@ -11,4 +11,7 @@ public class DrawModel {
         drawnObjects = new ArrayList<>(50);
     }
 
+    public List<DrawableObject> getAll(){
+        return drawnObjects;
+    }
 }

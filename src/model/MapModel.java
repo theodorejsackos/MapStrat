@@ -13,7 +13,7 @@ import java.util.Observable;
 
 public class MapModel extends Observable {
     private static final int SIZE = 8192;
-    private static final int MIN_KERNEL_WIDTH = 400, MIN_KERNEL_HEIGHT = 300;
+    private static final int MIN_KERNEL_SIZE = 400;
     private static final HashMap<Integer, String> supportedMaps = new HashMap<>();
     public static final Integer MAP_DEFAULT = 1, MAP_GIS = 2, MAP_TOPO = 3;
 
@@ -114,8 +114,8 @@ public class MapModel extends Observable {
 
     public void setKernelSize(int kernelSize) {
         kernelSize = Math.min(SIZE, kernelSize);
-        if (kernelSize < MIN_KERNEL_WIDTH)
-            this.kernelSize = MIN_KERNEL_WIDTH;
+        if (kernelSize < MIN_KERNEL_SIZE)
+            this.kernelSize = MIN_KERNEL_SIZE;
         else if (kernelX + kernelSize > SIZE && kernelY + kernelSize > SIZE) {
             this.kernelSize = kernelSize;
             this.kernelX = SIZE - kernelSize;

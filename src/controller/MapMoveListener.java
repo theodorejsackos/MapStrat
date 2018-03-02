@@ -15,6 +15,7 @@ public class MapMoveListener implements MouseListener, MouseMotionListener {
         this.mapModel = mapModel;
     }
 
+    /* Responds to the event of the user pushing a mouse button down */
     public void mousePressed(MouseEvent e) {
         /* When the right mouse is pressed down, record the position of the click
          * and begin scrolling the map around as the mouse is moved (handled by
@@ -26,6 +27,7 @@ public class MapMoveListener implements MouseListener, MouseMotionListener {
         }
     }
 
+    /* Responds to the event of the user releasing a mouse button from the down position */
     public void mouseReleased(MouseEvent e) {
         /* When the right mouse button is released, stop the scrolling. */
         if(e.getButton() == MouseEvent.BUTTON3) {
@@ -33,13 +35,17 @@ public class MapMoveListener implements MouseListener, MouseMotionListener {
         }
     }
 
+    /* If a mouse button is down and the mouse moves, respond to the event */
     public void mouseDragged(MouseEvent e) {
+        /* If the user is actively dragging the mouse around while the right mouse
+         * button is being pressed, appropriately slide the map around in accordance
+         * with the user's mouse movement. */
         if(dragActive){
             int deltaX = prevX - e.getX();
             int deltaY = prevY - e.getY();
 
-            mapModel.updateKernelX(mapModel.getKernelX() + deltaX);
-            mapModel.updateKernelY(mapModel.getKernelY() + deltaY);
+            mapModel.updateKernelX(mapModel.getKernelX() + deltaX * 2);
+            mapModel.updateKernelY(mapModel.getKernelY() + deltaY * 2);
 
             prevX = e.getX();
             prevY = e.getY();

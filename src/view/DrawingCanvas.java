@@ -1,5 +1,7 @@
 package view;
 
+import model.DrawModel;
+import model.DrawableObject;
 import model.MapModel;
 
 import javax.swing.*;
@@ -9,12 +11,14 @@ import java.util.Observer;
 
 public class DrawingCanvas extends JPanel implements Observer {
 
-    private MapModel model;
+    private MapModel mapModel;
+    private DrawModel drawModel;
     Dimension d;
 
-    public DrawingCanvas(MapModel m){
-        this.model = m;
-        m.initKernel(0, 0, Math.min(getSize().width, getSize().height));
+    public DrawingCanvas(MapModel mm, DrawModel dm){
+        this.mapModel  = mm;
+        this.drawModel = dm;
+        mapModel.initKernel(0, 0, Math.min(getSize().width, getSize().height));
     }
 
     @Override
@@ -23,7 +27,11 @@ public class DrawingCanvas extends JPanel implements Observer {
 
         Dimension d = getSize();
         int squareDimension = Math.min(d.width, d.height);
-        g.drawImage(model.getKernel(), 0, 0, squareDimension, squareDimension, null);
+        g.drawImage(mapModel.getKernel(), 0, 0, squareDimension, squareDimension, null);
+
+        for(DrawableObject drawable : drawModel.getAll()){
+            drawable.render(g);
+        }
     }
 
     @Override
