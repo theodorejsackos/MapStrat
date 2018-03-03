@@ -4,7 +4,7 @@ import java.awt.*;
 
 public abstract class DrawableObject {
     protected int x, y;
-    protected int width, height;
+    protected int width, height, size;
 
     protected DrawableObject(){
 
@@ -13,6 +13,12 @@ public abstract class DrawableObject {
     protected DrawableObject(int x, int y){
         this.x = x;
         this.y = y;
+    }
+
+    protected DrawableObject(int x, int y, int size){
+        this.x = x;
+        this.y = y;
+        this.size = size;
     }
 
     protected DrawableObject(int x, int y, int width, int height){
@@ -47,5 +53,9 @@ public abstract class DrawableObject {
     }
     public final void setHeight(int height) {
         this.height = height;
+    }
+    public final int getSize(){return size;}
+    public final void setSize(int size){
+        this.size = size;
     }
 }

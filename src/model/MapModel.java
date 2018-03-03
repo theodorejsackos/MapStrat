@@ -12,8 +12,8 @@ import java.util.HashMap;
 import java.util.Observable;
 
 public class MapModel extends Observable {
-    private static final int SIZE = 8192;
-    private static final int MIN_KERNEL_SIZE = 400;
+    private static final int SIZE = 2048;
+    private static final int MIN_KERNEL_SIZE = 100;
     private static final HashMap<Integer, String> supportedMaps = new HashMap<>();
     public static final int MAP_DEFAULT = 1, MAP_GIS = 2, MAP_TOPO = 3;
 
@@ -40,16 +40,16 @@ public class MapModel extends Observable {
     }
 
     @NotNull
-    private BufferedImage mapImage = new BufferedImage(SIZE, SIZE, BufferedImage.TYPE_INT_RGB);
+    private BufferedImage mapImage = new BufferedImage(1, 1, BufferedImage.TYPE_BYTE_GRAY);
     private Integer selectedMap = MAP_DEFAULT;
 
     /* The kernel is the actively viewable part of the map that is being displayed by the view */
     private int kernelX, kernelY, kernelSize;
 
     public MapModel(Integer selected) {
-        supportedMaps.put(MAP_DEFAULT, "erangel.jpg");
-        supportedMaps.put(MAP_GIS, "erangel-gis.jpg");
-        supportedMaps.put(MAP_TOPO, "erangel-topo.jpg");
+        supportedMaps.put(MAP_DEFAULT, "erangel-small.jpg");
+        supportedMaps.put(MAP_GIS, "erangel-gis-small.jpg");
+        supportedMaps.put(MAP_TOPO, "erangel-topo-small.jpg");
 
         assert (supportedMaps.containsKey(selected));
 
@@ -165,9 +165,14 @@ public class MapModel extends Observable {
     }
 
     public void initKernel(int kernelX, int kernelY, int kernelSize){
+        if(kernelSize < MIN_KERNEL_SIZE)
+            return;
+
+        /* Setting the new kernel size before the x and y position is important for zoom in
+         * kernel changes with large kernels */
+        setKernelSize(kernelSize);
         setKernelX(kernelX);
         setKernelY(kernelY);
-        setKernelSize(kernelSize);
         setChanged();
         notifyObservers();
     }
@@ -249,5 +254,9 @@ public class MapModel extends Observable {
 
     public boolean isLoading(){
         return loading;
+    }
+
+    public boolean pointInsideKernel(int x, int y){
+        return x > kernelX && x < (kernelX + kernelSize) && y > kernelY && y < (kernelY + kernelSize);
     }
 }

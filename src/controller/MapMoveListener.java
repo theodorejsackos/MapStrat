@@ -1,18 +1,27 @@
 package controller;
 
+import model.DrawModel;
 import model.MapModel;
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
 public class MapMoveListener implements MouseListener, MouseMotionListener {
     private MapModel mapModel;
+    private DrawModel drawModel;
+    private Component canvas;
     private int prevX, prevY;
     private boolean dragActive = false;
+    private Timer draw;
 
-    public MapMoveListener(MapModel mapModel){
+    public MapMoveListener(MapModel mapModel, DrawModel dm, Component canvas){
+        this.drawModel = dm;
         this.mapModel = mapModel;
+        this.canvas = canvas;
     }
 
     /* Responds to the event of the user pushing a mouse button down */
@@ -25,6 +34,16 @@ public class MapMoveListener implements MouseListener, MouseMotionListener {
             prevY = e.getY();
             dragActive = true;
         }
+
+        if(e.getButton() == MouseEvent.BUTTON1){
+            drawModel.startStroke(mapModel.getKernelX() + e.getX(), mapModel.getKernelY() + e.getY());
+            draw = new Timer(25, (ActionEvent evt) -> {
+                Point p = MouseInfo.getPointerInfo().getLocation();
+                SwingUtilities.convertPointFromScreen(p, canvas);
+                drawModel.addStroke(mapModel.getKernelX() + p.x, mapModel.getKernelY() + p.y);
+            });
+            draw.start();
+        }
     }
 
     /* Responds to the event of the user releasing a mouse button from the down position */
@@ -32,6 +51,11 @@ public class MapMoveListener implements MouseListener, MouseMotionListener {
         /* When the right mouse button is released, stop the scrolling. */
         if(e.getButton() == MouseEvent.BUTTON3) {
             dragActive = false;
+        }
+
+        if(e.getButton() == MouseEvent.BUTTON1){
+            drawModel.finalizeStroke(mapModel.getKernelX() + e.getX(), mapModel.getKernelY() + e.getY());
+            draw.stop();
         }
     }
 

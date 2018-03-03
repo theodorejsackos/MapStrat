@@ -100,6 +100,7 @@ public class ControlPanel extends JPanel implements Observer{
         mapSelection.add(normal);
         mapSelection.add(gis);
         mapSelection.add(topo);
+        normal.setSelected(true);
         this.add(radioGroup); // add them to the view
     }
 

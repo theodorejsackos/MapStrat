@@ -37,11 +37,15 @@ public class DrawingCanvas extends JPanel implements Observer {
             return;
         }
 
+        /* HUUUUGF 100ms BOTTLENECK NEED TO MINIMIZE THE SIZE OF THIS BACKGROUND DEPENDING ON
+         * THE KERNEL */
         int squareDimension = Math.min(d.width, d.height);
         g.drawImage(mapModel.getKernel(), 0, 0, squareDimension, squareDimension, null);
 
         for(DrawableObject drawable : drawModel.getAll()){
-            drawable.render(g);
+            int drawX = drawable.getX(), drawY = drawable.getY();
+            if(mapModel.pointInsideKernel(drawX, drawY))
+                drawable.render(g);
         }
     }
 

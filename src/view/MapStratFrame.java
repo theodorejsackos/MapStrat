@@ -34,4 +34,7 @@ public class MapStratFrame extends JFrame {
         this.setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
     }
 
+    public JPanel getDrawingCanvas(){
+        return canvas;
+    }
 }
