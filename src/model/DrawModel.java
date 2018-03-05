@@ -6,6 +6,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Observable;
 
+/** The DrawModel represents the state of the current drawing configuration
+ * (stamp vs. stroke, size, color, etc), as well as all objects that need to
+ * be rendered on the drawing canvas.
+ *
+ * @author Theodore Sackos (theodorejsackos@email.arizona.edu)
+ * @see view.DrawingCanvas
+ */
 public class DrawModel extends Observable{
 
     public static final int SMALL = 3, MEDIUM = 7, LARGE = 15;
@@ -13,11 +20,12 @@ public class DrawModel extends Observable{
     private List<DrawableObject> drawnObjects = null;
     private Color selectedColor;
     private int size;
-    private boolean drawing = false, stamping = false;
     private LineStroke currentStroke;
 
     public DrawModel(){
         drawnObjects = new ArrayList<>(50);
+        selectedColor = new Color(255, 0, 0);
+        size = MEDIUM;
     }
 
     public List<DrawableObject> getAll(){
@@ -36,7 +44,6 @@ public class DrawModel extends Observable{
 
     public void setSize(int size){
         this.size = size;
-        startDrawing();
         setChanged();
         notifyObservers();
     }
@@ -45,32 +52,9 @@ public class DrawModel extends Observable{
         return this.size;
     }
 
-    public void startDrawing(){
-        drawing  = true;
-        stamping = false;
-    }
-
-    public boolean isDrawing(){
-        return drawing;
-    }
-
-    public void startStamping(){
-        drawing  = false;
-        stamping = true;
-    }
-
-    public boolean isStamping(){
-        return stamping;
-    }
-
     public void startStroke(int x, int y){
-        drawing = true;
-        stamping = false;
         currentStroke = new LineStroke(x, y, this.size, this.selectedColor);
-        currentStroke.addStroke(x, y);
         drawnObjects.add(currentStroke);
-        setChanged();
-        notifyObservers();
     }
 
     public void addStroke(int x, int y){
@@ -80,10 +64,6 @@ public class DrawModel extends Observable{
     }
 
     public void finalizeStroke(int x, int y){
-        currentStroke.addStroke(x, y);
         currentStroke = null;
-        drawing = false;
-        setChanged();
-        notifyObservers();
     }
 }

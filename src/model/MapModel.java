@@ -11,6 +11,19 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Observable;
 
+/** The MapModel represents the state of the background image and the subimage being displayed
+ * from that background (referred to as the 'kernel'). This class manages a slew of things.
+ * In this class is a cached copy of each background image file, loaded from disk on initialization.
+ * While the loading of the images from disk happens, a loading sprite is animated and replaces
+ * the background image for all getter methods. The drawing canvas will ask for the current
+ * background image kernel; if the images have not yet been loaded from disk, the loading
+ * kernel will be displayed and animated until that loading finishes. This model also manages the
+ * position and size of the image kernel (always square), and returns the correct subimage
+ * of the background based on the current position of the kernel.
+ *
+ * @author Theodore Sackos (theodorejsackos@email.arizona.edu)
+ *
+ */
 public class MapModel extends Observable {
     private static final int SIZE = 2048;
     private static final int MIN_KERNEL_SIZE = 100;
@@ -78,6 +91,8 @@ public class MapModel extends Observable {
         String mapPath = "res/" + supportedMaps.get(selected);
         switch(selected){
             case MAP_DEFAULT:
+                if(cachedDefault != null)
+                    return;
                 try{
                     cachedDefault = ImageIO.read(new File(mapPath));
                 }catch(IOException e){
@@ -86,6 +101,8 @@ public class MapModel extends Observable {
                 }
                 break;
             case MAP_GIS:
+                if(cachedGis != null)
+                    return;
                 try{
                     cachedGis = ImageIO.read(new File(mapPath));
                 }catch(IOException e){
@@ -95,6 +112,8 @@ public class MapModel extends Observable {
                 break;
 
             case MAP_TOPO:
+                if(cachedTopo != null)
+                    return;
                 try{
                     cachedTopo = ImageIO.read(new File(mapPath));
                 }catch(IOException e){

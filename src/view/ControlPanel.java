@@ -7,13 +7,24 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.Observable;
 import java.util.Observer;
 
+/** The ControlPanel is a cluster of view elements controlling (and displaying) the current
+ * draw action state (stamping vs. drawing, brush size, color, etc.). The control panel
+ * represents the state of the DrawModel, and action listeners registered to these views
+ * manage changes to the DrawModel and MapModel (changing the background map).
+ *
+ * @author Theodore Sackos (theodorejsackos@email.arizona.edu)
+ *
+ * @see model.DrawModel
+ * @see model.MapModel
+ */
 public class ControlPanel extends JPanel implements Observer{
+
+    private static final Color NOT_SELECTED = new Color(200, 200, 200);
 
     private MapModel mapModel;
     private DrawModel drawModel;
@@ -107,7 +118,7 @@ public class ControlPanel extends JPanel implements Observer{
     /* Given a button to be selected, the size of that selection, and the other two size buttons
      * to be 'unselected' change the background appropriately */
     private void selectButton(JButton select, JButton unselect1, JButton unselect2){
-        select.setBackground(new Color(200, 200, 200));
+        select.setBackground(NOT_SELECTED);
         unselect1.setBackground(null);
         unselect2.setBackground(null);
     }

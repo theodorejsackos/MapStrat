@@ -7,6 +7,17 @@ import javax.swing.*;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
+
+/** The MapScrollListener responds to map zooming events. When the user scrolls up on the mouse
+ * wheel the kernel's size is decreased and the position of the kernel is adjusted relative to the
+ * current position of the user's mouse (the smaller kernel attempts to center itself on the user's
+ * mouse). When the mouse wheel is scrolled down, the kernel's size is increased. It zooms out equally
+ * in all directions regardless of the mouses position. These decisions were made to emulate the behavior
+ * of the in-game map of PUBG.
+ *
+ * @author Theodore Sackos (theodorejsackos@email.arizona.edu)
+ * @see model.MapModel
+ */
 public class MapScrollListener implements MouseWheelListener{
 
     private MapModel mapModel;
