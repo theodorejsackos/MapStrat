@@ -1,6 +1,8 @@
 package model;
 
 
+import util.CoordinateUtilities;
+
 import java.awt.*;
 import java.util.LinkedList;
 import java.util.List;
@@ -50,6 +52,31 @@ public class LineStroke extends DrawableObject {
 
         /* Load the old color */
         g2d.setColor(old);
+    }
+
+
+
+    @Override
+    public void renderRelativeToKernel(Graphics g, int kx, int ky, int ksize, int csize){
+         /* A line needs at least two points */
+        if(stroke.size() < 2)
+            return;
+
+        /* Save off the old color being used */
+        Graphics2D g2d = (Graphics2D) g;
+
+        /* Set the graphic's drawing state to the color of this line with the size of this line */
+        g2d.setColor(c);
+        g2d.setStroke(new BasicStroke(1));
+
+        /* For each sequential pair of points in the line, draw a graphics line between the two */
+        Point last = stroke.get(0);
+        for(int i = 1; i < stroke.size(); i++) {
+            Point lastRel = CoordinateUtilities.relPointFromAbs(kx, ky, last, ksize, csize);
+            Point currRel = CoordinateUtilities.relPointFromAbs(kx, ky, stroke.get(i), ksize, csize);
+            g.drawLine(lastRel.x, lastRel.y, currRel.x, currRel.y);
+            last = stroke.get(i);
+        }
     }
 
     /* Add a visited point to the list of points representing this stroke */

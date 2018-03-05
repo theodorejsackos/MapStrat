@@ -63,7 +63,7 @@ public class DrawModel extends Observable{
         notifyObservers();
     }
 
-    public void finalizeStroke(int x, int y){
+    public void finalizeStroke(){
         currentStroke = null;
     }
 }

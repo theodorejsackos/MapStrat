@@ -29,6 +29,7 @@ public abstract class DrawableObject {
     }
 
     public abstract void render(Graphics g);
+    public abstract void renderRelativeToKernel(Graphics g, int kx, int ky, int ksize, int csize);
 
     public final int getX() {
         return x;

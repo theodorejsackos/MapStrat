@@ -4,6 +4,7 @@ import com.sun.istack.internal.NotNull;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -25,8 +26,8 @@ import java.util.Observable;
  *
  */
 public class MapModel extends Observable {
-    private static final int SIZE = 2048;
-    private static final int MIN_KERNEL_SIZE = 100;
+    private static final int SIZE = 4096;
+    private static final int MIN_KERNEL_SIZE = 200;
     private static final HashMap<Integer, String> supportedMaps = new HashMap<>();
     public static final int MAP_DEFAULT = 1, MAP_GIS = 2, MAP_TOPO = 3;
 
@@ -60,9 +61,9 @@ public class MapModel extends Observable {
     private int kernelX, kernelY, kernelSize;
 
     public MapModel(Integer selected) {
-        supportedMaps.put(MAP_DEFAULT, "erangel-small.jpg");
-        supportedMaps.put(MAP_GIS, "erangel-gis-small.jpg");
-        supportedMaps.put(MAP_TOPO, "erangel-topo-small.jpg");
+        supportedMaps.put(MAP_DEFAULT, "erangel-med.jpg");
+        supportedMaps.put(MAP_GIS, "erangel-gis-med.jpg");
+        supportedMaps.put(MAP_TOPO, "erangel-topo-med.jpg");
 
         assert (supportedMaps.containsKey(selected));
 
@@ -277,5 +278,9 @@ public class MapModel extends Observable {
 
     public boolean pointInsideKernel(int x, int y){
         return x > kernelX && x < (kernelX + kernelSize) && y > kernelY && y < (kernelY + kernelSize);
+    }
+
+    public static boolean pointInsideKernel(Point p, int kx, int ky, int ksize){
+        return p.x > kx && p.x < (kx + ksize) && p.y > ky && p.y < (ky + ksize);
     }
 }

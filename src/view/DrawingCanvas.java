@@ -59,8 +59,8 @@ public class DrawingCanvas extends JPanel implements Observer {
         /* Render all drawn objects */
         for(DrawableObject drawable : drawModel.getAll()){
             int drawX = drawable.getX(), drawY = drawable.getY();
-            if(mapModel.pointInsideKernel(drawX, drawY))
-                drawable.render(g);
+            drawable.renderRelativeToKernel(g,
+                        mapModel.getKernelX(), mapModel.getKernelY(), mapModel.getKernelSize(), this.getWidth());
         }
     }
 

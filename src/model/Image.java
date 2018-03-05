@@ -31,4 +31,9 @@ public class Image extends DrawableObject{
     public void render(Graphics g) {
         g.drawImage(image, x - (width / 2), y - (height / 2), null);
     }
+
+    @Override
+    public void renderRelativeToKernel(Graphics g, int kx, int ky, int ksize, int csize) {
+
+    }
 }
