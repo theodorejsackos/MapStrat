@@ -8,6 +8,7 @@ import model.MapModel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ComponentEvent;
 
 /** The MapStratFrame is the top-level window container for the applicataion's view elements.
  * The MapStratFrame contains a drawable, scrollable, zoomable canvas displaying a portion

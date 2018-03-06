@@ -21,42 +21,33 @@ import java.util.List;
  */
 public class LineStroke extends DrawableObject {
 
-    private Color c;
+    /* The sequence of points that form the stroke  */
     private List<Point> stroke;
-    public LineStroke(int globalX, int globalY, int size, Color c){
-        super(globalX, globalY, size);
-        this.c = c;
+
+    /* The color of the stroke to be drawn */
+    private final Color color;
+    private final int size;
+
+    LineStroke(Color color, int size){
+        super();
+        this.color = color;
+        this.size = size;
         stroke = new LinkedList<>();
     }
 
-    @Override
-    public void render(Graphics g) {
-        /* A line needs at least two points */
-        if(stroke.size() < 2)
-            return;
-
-        /* Save off the old color being used */
-        Graphics2D g2d = (Graphics2D) g;
-        Color old = g2d.getColor();
-
-        /* Set the graphic's drawing state to the color of this line with the size of this line */
-        g2d.setColor(c);
-        g2d.setStroke(new BasicStroke(size));
-
-        /* For each sequential pair of points in the line, draw a graphics line between the two */
-        Point last = stroke.get(0);
-        for(int i = 1; i < stroke.size(); i++) {
-            g.drawLine(last.x, last.y, stroke.get(i).x, stroke.get(i).y);
-            last = stroke.get(i);
-        }
-
-        /* Load the old color */
-        g2d.setColor(old);
-    }
-
-
-
-    @Override
+    /** renderRelativeToKernel -- The line being drawn should be appropriately scaled
+     * to only show the part of the line that is actually in the current kernel. The
+     * lines drawn on the map remain fixed to those positions, regardless of kernel size
+     * or location. This method manages the conversion of the points of this line from
+     * their absolute positions to the relative positions within the current kernel
+     *
+     * @param g     The graphics object the line should be rendered on
+     * @param kx    The top left x component of the kernel position
+     * @param ky    The top left y component of the kernel position
+     * @param ksize The width of the kernel (always square)
+     * @param csize The width of the drawing canvas the line should be relatively adjusted to
+     *              (again, always square).
+     */
     public void renderRelativeToKernel(Graphics g, int kx, int ky, int ksize, int csize){
          /* A line needs at least two points */
         if(stroke.size() < 2)
@@ -66,8 +57,8 @@ public class LineStroke extends DrawableObject {
         Graphics2D g2d = (Graphics2D) g;
 
         /* Set the graphic's drawing state to the color of this line with the size of this line */
-        g2d.setColor(c);
-        g2d.setStroke(new BasicStroke(1));
+        g2d.setColor(color);
+        g2d.setStroke(new BasicStroke(size));
 
         /* For each sequential pair of points in the line, draw a graphics line between the two */
         Point last = stroke.get(0);

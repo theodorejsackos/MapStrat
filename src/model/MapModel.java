@@ -1,10 +1,7 @@
 package model;
 
-import com.sun.istack.internal.NotNull;
-
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -28,6 +25,7 @@ import java.util.Observable;
 public class MapModel extends Observable {
     private static final int SIZE = 4096;
     private static final int MIN_KERNEL_SIZE = 200;
+    private static final int loadingKernelY = 0, loadingKernelSize = 128;
     private static final HashMap<Integer, String> supportedMaps = new HashMap<>();
     public static final int MAP_DEFAULT = 1, MAP_GIS = 2, MAP_TOPO = 3;
 
@@ -35,13 +33,16 @@ public class MapModel extends Observable {
     private static BufferedImage cachedDefault = null, cachedGis = null, cachedTopo = null;
     private static BufferedImage loadingRing = null;
     private boolean loading = true;
-    private int loadingKernelX = 0, loadingKernelY = 0, loadingKernelSize = 128;
-    Timer ringAnimator = null;
+    private int loadingKernelX = 0;
+    private Timer ringAnimator = null;
+
     private class BackgroundCacher extends Thread {
+
         private int desired;
-        public BackgroundCacher(int desiredBackground){
+        BackgroundCacher(int desiredBackground){
             this.desired = desiredBackground;
         }
+
         public void run(){
             cacheBackground(MAP_DEFAULT);
             cacheBackground(MAP_GIS);
@@ -53,9 +54,7 @@ public class MapModel extends Observable {
         }
     }
 
-    @NotNull
     private BufferedImage mapImage = new BufferedImage(1, 1, BufferedImage.TYPE_BYTE_GRAY);
-    private Integer selectedMap = MAP_DEFAULT;
 
     /* The kernel is the actively viewable part of the map that is being displayed by the view */
     private int kernelX, kernelY, kernelSize;
@@ -122,21 +121,17 @@ public class MapModel extends Observable {
                     cachedTopo = new BufferedImage(SIZE, SIZE, BufferedImage.TYPE_INT_RGB);
                 }
                 break;
-
-            default:
-                System.err.println("Unknown selected map type: " + selected);
         }
     }
 
-    /**
+    /** Changes the background image being rendered on the drawing canvas.
      *
-     * @param newMap
+     * @param newMap The map code; should be one of MapModel.{MAP_DEFAULT, MAP_GIS, MAP_TOPO}
      */
     public void setMap(Integer newMap){
         assert(supportedMaps.containsKey(newMap));
 
-        selectedMap = newMap;
-        switch(selectedMap){
+        switch(newMap){
             case MAP_DEFAULT:
                 mapImage = cachedDefault;
                 break;
@@ -146,19 +141,9 @@ public class MapModel extends Observable {
             case MAP_TOPO:
                 mapImage = cachedTopo;
                 break;
-            default:
-                System.err.println("Unknown selected map type: " + selectedMap);
         }
         setChanged();
         notifyObservers();
-    }
-
-    /**
-     *
-     * @return
-     */
-    public BufferedImage getMap(){
-        return mapImage;
     }
 
     public BufferedImage getKernel(){
@@ -166,30 +151,16 @@ public class MapModel extends Observable {
             return loadingRing.getSubimage(loadingKernelX, loadingKernelY, loadingKernelSize, loadingKernelSize);
         }
 
-        if(kernelInitialized())
-            return mapImage.getSubimage(kernelX, kernelY, kernelSize, kernelSize);
-        else
-            return getMap();
+        return mapImage.getSubimage(kernelX, kernelY, kernelSize, kernelSize);
     }
 
-    /**
-     *
-     * @return
-     */
-    public int getMapSize(){
-        return SIZE;
-    }
-
-    private boolean kernelInitialized(){
-        return (kernelSize != -1) && (kernelX != -1) && (kernelY != -1);
-    }
-
-    public void initKernel(int kernelX, int kernelY, int kernelSize){
+    public void updateKernel(int kernelX, int kernelY, int kernelSize){
         if(kernelSize < MIN_KERNEL_SIZE)
             return;
 
-        /* Setting the new kernel size before the x and y position is important for zoom in
-         * kernel changes with large kernels */
+        /* Setting the new kernel size before the x and y position is important for zoom-in with
+         * large kernels. If this is not done first, then the zoom in will use the old kernel size
+         * in the calculations of the new x,y positions which may yield incorrect positioning. */
         setKernelSize(kernelSize);
         setKernelX(kernelX);
         setKernelY(kernelY);
@@ -197,7 +168,7 @@ public class MapModel extends Observable {
         notifyObservers();
     }
 
-    public void setKernelX(int kernelX) {
+    private void setKernelX(int kernelX) {
         if (kernelX < 0)
             this.kernelX = 0;
         else if (kernelX > SIZE - kernelSize)
@@ -206,7 +177,7 @@ public class MapModel extends Observable {
             this.kernelX = kernelX;
     }
 
-    public void setKernelY(int kernelY) {
+    private void setKernelY(int kernelY) {
         if (kernelY < 0)
             this.kernelY = 0;
         else if (kernelY > SIZE - kernelSize)
@@ -215,7 +186,7 @@ public class MapModel extends Observable {
             this.kernelY = kernelY;
     }
 
-    public void setKernelSize(int kernelSize) {
+    private void setKernelSize(int kernelSize) {
         kernelSize = Math.min(SIZE, kernelSize);
         if (kernelSize < MIN_KERNEL_SIZE)
             this.kernelSize = MIN_KERNEL_SIZE;
@@ -254,12 +225,6 @@ public class MapModel extends Observable {
         notifyObservers();
     }
 
-    public void updateKernelSize(int kernelSize){
-        setKernelSize(kernelSize);
-        setChanged();
-        notifyObservers();
-    }
-
     public int getKernelX() {
         return kernelX;
     }
@@ -274,13 +239,5 @@ public class MapModel extends Observable {
 
     public boolean isLoading(){
         return loading;
-    }
-
-    public boolean pointInsideKernel(int x, int y){
-        return x > kernelX && x < (kernelX + kernelSize) && y > kernelY && y < (kernelY + kernelSize);
-    }
-
-    public static boolean pointInsideKernel(Point p, int kx, int ky, int ksize){
-        return p.x > kx && p.x < (kx + ksize) && p.y > ky && p.y < (ky + ksize);
     }
 }

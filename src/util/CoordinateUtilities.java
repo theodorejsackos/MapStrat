@@ -2,7 +2,7 @@ package util;
 
 import java.awt.*;
 
-public class CoordinateUtilities {
+public abstract class CoordinateUtilities {
 
     /** absPosFromRel -- Convert a point coordinate (like the x component of a mouse position)
      * to the absolute position of that coordinate on the background image given the relative
@@ -35,7 +35,7 @@ public class CoordinateUtilities {
      * @param rel   The relative point position within the canvas to be converted to an absolute
      * @param ksize The size of the kernel
      * @param csize The size of the canvas to be relative to
-     * @return
+     * @return The point in absolute coordinates to the background image
      */
     public static Point absPointFromRel(int kx, int ky, Point rel, int ksize, int csize){
         int absx = absPosFromRel(kx, rel.x, ksize, csize);
@@ -53,7 +53,7 @@ public class CoordinateUtilities {
      * @param abs   The absolute point position to be converted
      * @param ksize The size of the kernel
      * @param csize The size of the canvas to be relative to
-     * @return
+     * @return The point in relative coordinates to the canvas
      */
     public static Point relPointFromAbs(int kx, int ky, Point abs, int ksize, int csize){
         int relx = relPosFromAbs(kx, abs.x, ksize, csize);

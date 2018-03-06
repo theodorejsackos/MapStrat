@@ -3,7 +3,6 @@ package controller;
 import model.MapModel;
 import view.MapStratFrame;
 
-import javax.swing.*;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 
@@ -46,12 +45,12 @@ public class MapScrollListener implements MouseWheelListener{
             int delta = oldKernelSize - larger;
             int newKernelX = mapModel.getKernelX() - Math.abs(delta) / 2;
             int newKernelY = mapModel.getKernelY() - Math.abs(delta) / 2;
-            mapModel.initKernel(newKernelX, newKernelY, larger);
+            mapModel.updateKernel(newKernelX, newKernelY, larger);
         }else {
             int delta = oldKernelSize - smaller;
             int newKernelX = mapModel.getKernelX() + ((int) (percentX * delta));
             int newKernelY = mapModel.getKernelY() + ((int) (percentY * delta));
-            mapModel.initKernel(newKernelX, newKernelY, smaller);
+            mapModel.updateKernel(newKernelX, newKernelY, smaller);
         }
     }
 }

@@ -45,16 +45,7 @@ public class MapDrawListener implements MouseListener {
          * for the line's path - mouseDragged can be unreliable depending on what work is being
          * done on the main thread */
         if(e.getButton() == MouseEvent.BUTTON1){
-            /* Convert the mouse position from the relative position within the view element to
-             * an absolute position within the background image. */
-            Point abs = CoordinateUtilities.absPointFromRel(
-                    mapModel.getKernelX(),
-                    mapModel.getKernelY(),
-                    new Point(e.getX(), e.getY()),
-                    mapModel.getKernelSize(),
-                    canvas.getWidth()
-            );
-            drawModel.startStroke(abs.x, abs.y);
+            drawModel.startStroke();
 
             /* For every MOUSE_POSITION_POLLING_RATE millisections, poll the position of the mouse on
              * the screen, convert it to a position relative to the canvas, and add it to the points that
@@ -64,7 +55,7 @@ public class MapDrawListener implements MouseListener {
                 SwingUtilities.convertPointFromScreen(p, canvas);
 
                 /* Convert the polled mouse position to absolute coordinates. */
-                Point absolute = CoordinateUtilities.absPointFromRel(
+                Point abs = CoordinateUtilities.absPointFromRel(
                         mapModel.getKernelX(),
                         mapModel.getKernelY(),
                         p,
@@ -73,7 +64,7 @@ public class MapDrawListener implements MouseListener {
                 );
 
                 /* Add the absolute position to the ListStroke object */
-                drawModel.addStroke(absolute.x, absolute.y);
+                drawModel.addStroke(abs.x, abs.y);
             });
             /* Start the polling thread */
             draw.start();

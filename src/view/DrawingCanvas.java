@@ -26,7 +26,7 @@ public class DrawingCanvas extends JPanel implements Observer {
     public DrawingCanvas(MapModel mm, DrawModel dm){
         this.mapModel  = mm;
         this.drawModel = dm;
-        mapModel.initKernel(0, 0, Integer.MAX_VALUE); // Maximize the size of the kernel, show the whole map
+        mapModel.updateKernel(0, 0, Integer.MAX_VALUE); // Maximize the size of the kernel, show the whole map
     }
 
     @Override
@@ -58,7 +58,6 @@ public class DrawingCanvas extends JPanel implements Observer {
 
         /* Render all drawn objects */
         for(DrawableObject drawable : drawModel.getAll()){
-            int drawX = drawable.getX(), drawY = drawable.getY();
             drawable.renderRelativeToKernel(g,
                         mapModel.getKernelX(), mapModel.getKernelY(), mapModel.getKernelSize(), this.getWidth());
         }

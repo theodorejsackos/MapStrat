@@ -15,17 +15,17 @@ import java.util.Observable;
  */
 public class DrawModel extends Observable{
 
-    public static final int SMALL = 3, MEDIUM = 7, LARGE = 15;
+    public static final int BRUSH_SIZE_MINIMUM = 1, BRUSH_SIZE_MAXIMUM = 10;
 
     private List<DrawableObject> drawnObjects = null;
     private Color selectedColor;
-    private int size;
+    private int selectedSize;
     private LineStroke currentStroke;
 
     public DrawModel(){
         drawnObjects = new ArrayList<>(50);
         selectedColor = new Color(255, 0, 0);
-        size = MEDIUM;
+        selectedSize = 1;
     }
 
     public List<DrawableObject> getAll(){
@@ -43,17 +43,17 @@ public class DrawModel extends Observable{
     }
 
     public void setSize(int size){
-        this.size = size;
+        this.selectedSize = size;
         setChanged();
         notifyObservers();
     }
 
     public int getSize(){
-        return this.size;
+        return this.selectedSize;
     }
 
-    public void startStroke(int x, int y){
-        currentStroke = new LineStroke(x, y, this.size, this.selectedColor);
+    public void startStroke(){
+        currentStroke = new LineStroke(selectedColor, selectedSize);
         drawnObjects.add(currentStroke);
     }
 
