@@ -1,5 +1,6 @@
 import model.DrawModel;
 import model.MapModel;
+import model.SessionModel;
 import view.MapStratFrame;
 
 import java.awt.*;
@@ -34,10 +35,11 @@ public class MapStratClient {
             /* Registers a new event queue that tracks how long each action in the queue takes to execute */
             Toolkit.getDefaultToolkit().getSystemEventQueue().push(new TimedEventQueue());
 
-        MapModel  mapModel  = new MapModel(MapModel.MAP_DEFAULT);
-        DrawModel drawModel = new DrawModel();
+        MapModel  mapModel     = new MapModel(MapModel.MAP_DEFAULT);
+        DrawModel drawModel    = new DrawModel();
+        SessionModel seshModel = new SessionModel();
 
-        MapStratFrame window = new MapStratFrame(mapModel, drawModel);
+        MapStratFrame window = new MapStratFrame(mapModel, drawModel, seshModel);
         window.setVisible(true);
     }
 }

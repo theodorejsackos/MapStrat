@@ -5,9 +5,11 @@ import controller.MapMoveListener;
 import controller.MapScrollListener;
 import model.DrawModel;
 import model.MapModel;
+import model.SessionModel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.ComponentEvent;
 
 /** The MapStratFrame is the top-level window container for the applicataion's view elements.
@@ -23,10 +25,32 @@ public class MapStratFrame extends JFrame {
 
     private static final int PREFERRED_CANVAS_SIZE = 800, PREFERRED_CONTROL_SIZE = 200;
 
+    private MenuBar menu;
     private DrawingCanvas canvas;
     private ControlPanel  control;
 
-    public MapStratFrame(MapModel map, DrawModel draw){
+    public MapStratFrame(MapModel map, DrawModel draw, SessionModel sesh){
+
+
+        /* Create the Menu Bar and the Session menu option */
+        menu = new MenuBar(sesh);
+
+        /*menu = new JMenuBar();*/
+        JMenu session = new JMenu("Session");
+        JMenuItem join = new JMenuItem("Join Session...");
+        join.addActionListener((ActionEvent e) -> {
+            String whatTheUserEntered = JOptionPane.showInputDialog("What session would you like to join?");
+            if (whatTheUserEntered != null) {
+                sesh.joinSession(whatTheUserEntered);
+            }
+        });
+
+        JMenuItem leave = new JMenuItem("Leave Session");
+        leave.setEnabled(false);
+        session.add(join);
+        session.add(leave);
+        menu.add(session);
+        this.add(menu, BorderLayout.NORTH);
 
         /* Create the background map view and add it to this window */
         canvas = new DrawingCanvas(map, draw);
