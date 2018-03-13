@@ -1,8 +1,9 @@
 package model;
 
 import java.awt.*;
+import java.io.Serializable;
 
-public abstract class DrawableObject {
+public abstract class DrawableObject implements Serializable {
     private static int ID_COUNTER = 0;
 
     private final int drawObjectId;

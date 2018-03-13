@@ -1,17 +1,14 @@
-package network;
+package newnet;
 
 import java.io.Serializable;
 
 public enum MessageType implements Serializable {
 
-    HANDSHAKE (0),
-    HEARTBEAT (1),
-    WITHDRAW  (2),
-    NEW_STROKE(3),
-    NEW_STAMP (4),
-    CLEAR(5),
-    UNDO (6),
-    REDO (7);
+    JOIN_GROUP(0),
+    LEAVE_GROUP(1),
+    UPDATE(2),
+    REFRESH(3),
+    STATUS(4);
 
     private final int type;
     MessageType(int type){
