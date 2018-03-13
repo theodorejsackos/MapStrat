@@ -11,13 +11,58 @@ public class DrawStateServer extends ServerSocket implements Runnable{
 
     private ConcurrentHashMap<String, Group> sessions;
 
-    public DrawStateServer() throws IOException {
+    public static void main(String[] args) throws IOException{
+        new DrawStateServer();
+    }
+
+    private DrawStateServer() throws IOException {
         super();
         sessions = new ConcurrentHashMap<>();
-
         new Thread(this).start();
     }
 
+    /** DrawStateServer.run() --
+     *
+     * The server socket will run a thread accepting clients and distributing the
+     * management work to other threads.
+     */
+    public void run() {
+        try {
+            while(true) {
+                /* Accept all incoming connections and pass them off to the ClientHandler threads */
+                hostAccept();
+            }
+        } catch(IOException e){
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+
+    private void hostAccept() throws IOException{
+        /* Accept a host and wrap input and output streams */
+        Host client = (Host) accept();
+        client.ois = new ObjectInputStream(client.getInputStream());
+        client.oos = new ObjectOutputStream(client.getOutputStream());
+
+        /* Connecting host is responsible for sharing the group id they want to join */
+        Message m = Message.get(client);
+        if(m != null && m.isJoin()){
+            client.id = m.getGroupId();
+            new ClientHandler(client).start();
+        }
+        /* Wrong handshake message, or invalid messages should have the host dropped */
+        else{
+            System.err.println("Dropping host attempting to connect with bad handshake");
+            client.close();
+        }
+    }
+
+
+
+    /* class ClientHandler --
+     * Receives a client socket connection that has already been established,
+     * facilitates the server processing logic for requests from and updates to
+     * the given client. */
     private class ClientHandler extends Thread {
 
         private final Group group;
@@ -54,38 +99,32 @@ public class DrawStateServer extends ServerSocket implements Runnable{
 
             // Respond to the client with a status message
             Message status = Message.status(client.id, group.getNumPeers());
+            status.send(client);
 
             while(true){
-                Message incoming = Message.get(client.ois);
-            }
-        }
-    }
-
-    @Override
-    public void run() {
-        try {
-            /* Accept all incoming connections and pass them off to the GroupHandler threads */
-            while(true) {
-                Host client = (Host) accept();
-                client.ois = new ObjectInputStream(client.getInputStream());
-                client.oos = new ObjectOutputStream(client.getOutputStream());
-                Message m = Message.get(client.ois);
-                if(m.isJoin()){
-                    client.id = m.getGroupId();
-                    new ClientHandler(client).start();
-                }else{
-                    client.close();
+                Message m = Message.get(client);
+                if(m == null) {
+                    System.err.println("Garbage message received from " + client);
+                    continue;
                 }
-
-
+                switch(m.type){
+                    case JOIN_GROUP:
+                        System.err.println("Already connected client attempting to join group");
+                        break;
+                    case LEAVE_GROUP:
+                        System.err.println("Already connected client attempting to leave group");
+                        break;
+                    case STATUS:
+                        System.err.println("Connected client sending a status message to server");
+                        break;
+                    case UPDATE:
+                        System.err.println("Connected client sending a update message to server");
+                        break;
+                    case REFRESH:
+                        System.err.println("Connected client sending a refresh message to server");
+                        break; 
+                }
             }
-        } catch(IOException e){
-            e.printStackTrace();
-            System.exit(1);
         }
-    }
-
-    public static void main(String[] args) throws IOException{
-        DrawStateServer mss = new DrawStateServer();
     }
 }

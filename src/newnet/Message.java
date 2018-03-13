@@ -1,5 +1,6 @@
 package newnet;
 
+import com.sun.istack.internal.NotNull;
 import model.DrawableObject;
 import util.GroupUtilities;
 
@@ -17,10 +18,11 @@ import java.util.List;
  */
 public class Message implements Serializable {
 
-    /* Bookkeeping information */
-    private MessageType type;
-    private boolean     isGlobal;
-    private long        groupId;
+    /* Bookkeeping information, Mandatory for all messages that these fields are used */
+    @NotNull
+    final MessageType type;
+    @NotNull
+    final long        gid;
 
     /* State information, may be null and unused */
     private List<DrawableObject> state;    // For updating a client's state
@@ -28,7 +30,8 @@ public class Message implements Serializable {
     private int                  numPeers; // For status update messages (session/group information).
 
     private Message(MessageType t, long gid){
-
+        this.type = t;
+        this.gid  = gid;
     }
 
     public static Message join(String group){
@@ -57,16 +60,25 @@ public class Message implements Serializable {
         return m;
     }
 
-    public static Message get(ObjectInputStream ois){
+    public static Message get(Host from){
         try{
-            return (Message) ois.readObject();
+            return (Message) from.ois.readObject();
         } catch (IOException | ClassNotFoundException e){
             return null;
         }
     }
 
+    public void send(Host to){
+        try{
+            to.oos.writeObject(this);
+        } catch (IOException e){
+            System.err.println("Failed to send to destination in group " + destination.id);
+            System.err.println("Intended message: '" + this.toString() + "'");
+        }
+    }
+
     public String getGroupId(){
-        return GroupUtilities.groupNameFromId(groupId);
+        return GroupUtilities.groupNameFromId(gid);
     }
 
     public boolean isJoin(){
@@ -83,5 +95,26 @@ public class Message implements Serializable {
 
     public boolean isRefresh(){
         return type == MessageType.REFRESH;
+    }
+
+    @Override
+    public String toString(){
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.type.name());
+        sb.append(": ");
+        sb.append(GroupUtilities.groupNameFromId(this.gid));
+        sb.append(" (");
+        sb.append(this.gid);
+        sb.append(")\n");
+
+        if(this.type == MessageType.STATUS){
+            sb.append("NumPeers: ");
+            sb.append(numPeers);
+            sb.append("\n");
+        }
+
+        //TODO: If message type == UPDATE or REFRESH append appropriate information
+
+        return sb.toString();
     }
 }

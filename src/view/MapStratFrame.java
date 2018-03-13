@@ -41,7 +41,7 @@ public class MapStratFrame extends JFrame {
         join.addActionListener((ActionEvent e) -> {
             String whatTheUserEntered = JOptionPane.showInputDialog("What session would you like to join?");
             if (whatTheUserEntered != null) {
-                sesh.joinSession(whatTheUserEntered);
+                System.err.println("Joining session: " + whatTheUserEntered);
             }
         });
 
