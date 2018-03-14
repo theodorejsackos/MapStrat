@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class DrawStateServer extends ServerSocket implements Runnable{
@@ -88,14 +87,14 @@ public class DrawStateServer extends ServerSocket implements Runnable{
         @Override
         public void run(){
             try{
-                safeRun();
+                handleClient();
             }catch (IOException e){
                 e.printStackTrace();
                 System.exit(1);
             }
         }
 
-        private void safeRun() throws IOException {
+        private void handleClient() throws IOException {
 
             // Respond to the client with a status message
             Message status = Message.status(client.id, group.getNumPeers());
@@ -107,22 +106,29 @@ public class DrawStateServer extends ServerSocket implements Runnable{
                     System.err.println("Garbage message received from " + client);
                     continue;
                 }
+
+                System.out.printf("[Group %s]: Client handler received ", client.id);
                 switch(m.type){
                     case JOIN_GROUP:
-                        System.err.println("Already connected client attempting to join group");
+                        System.err.println("JOIN_GROUP message");
                         break;
                     case LEAVE_GROUP:
-                        System.err.println("Already connected client attempting to leave group");
+                        System.err.println("LEAVE_GROUP message");
+                        /* Notify the client that they have left the group (numpeers = 0) */
+                        Message.status(client.id, 0).send(client);
+                        /* Remove the client from the group and close the connection */
+                        group.drop(client);
                         break;
                     case STATUS:
-                        System.err.println("Connected client sending a status message to server");
+                        System.err.println("STATUS message");
                         break;
                     case UPDATE:
-                        System.err.println("Connected client sending a update message to server");
+                        System.err.println("UPDATE message");
                         break;
-                    case REFRESH:
-                        System.err.println("Connected client sending a refresh message to server");
-                        break; 
+                    case REFRESH: // Client requesting most up-to date drawing state
+                        System.err.println("REFRESH message");
+                        group.updateUnicast(client);
+                        break;
                 }
             }
         }

@@ -60,6 +60,12 @@ public class Message implements Serializable {
         return m;
     }
 
+    public static Message refresh(String group, List<DrawableObject> state){
+        Message m = new Message(MessageType.REFRESH, GroupUtilities.groupIdFromName(group));
+        m.state = state;
+        return m;
+    }
+
     public static Message get(Host from){
         try{
             return (Message) from.ois.readObject();
@@ -72,7 +78,7 @@ public class Message implements Serializable {
         try{
             to.oos.writeObject(this);
         } catch (IOException e){
-            System.err.println("Failed to send to destination in group " + destination.id);
+            System.err.println("Failed to send to destination in group " + to.id);
             System.err.println("Intended message: '" + this.toString() + "'");
         }
     }
