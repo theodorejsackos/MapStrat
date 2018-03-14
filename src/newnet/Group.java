@@ -45,6 +45,10 @@ public class Group {
         client.close();
     }
 
+    public void updateState(DrawableObject o){
+        state.add(o);
+        updateBroadcast();
+    }
 
     public void updateUnicast(Host client){
         Message.refresh(gid, state).send(client);

@@ -26,7 +26,7 @@ public class Message implements Serializable {
 
     /* State information, may be null and unused */
     private List<DrawableObject> state;    // For updating a client's state
-    private DrawableObject       newItem;  // For adding to the server's state
+    private DrawableObject       newStroke;  // For adding to the server's state
     private int                  numPeers; // For status update messages (session/group information).
 
     private Message(MessageType t, long gid){
@@ -101,6 +101,12 @@ public class Message implements Serializable {
 
     public boolean isRefresh(){
         return type == MessageType.REFRESH;
+    }
+
+    public DrawableObject getStroke(){
+        assert(type == MessageType.UPDATE);
+        assert(newStroke != null);
+        return newStroke;
     }
 
     @Override
