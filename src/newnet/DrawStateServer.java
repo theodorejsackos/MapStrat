@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
+import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class DrawStateServer extends ServerSocket implements Runnable{
@@ -11,11 +12,15 @@ public class DrawStateServer extends ServerSocket implements Runnable{
     private ConcurrentHashMap<String, Group> sessions;
 
     public static void main(String[] args) throws IOException{
-        new DrawStateServer();
+        int port = 0;
+        if(Arrays.asList(args).contains("-p")){
+            port = Integer.parseInt(args[Arrays.asList(args).indexOf("-p") + 1]);
+        }
+        new DrawStateServer(port);
     }
 
-    private DrawStateServer() throws IOException {
-        super();
+    private DrawStateServer(int port) throws IOException {
+        super(port);
         sessions = new ConcurrentHashMap<>();
         new Thread(this).start();
     }
@@ -86,6 +91,8 @@ public class DrawStateServer extends ServerSocket implements Runnable{
 
         @Override
         public void run(){
+            System.out.println("Listening for client(s) on port #" + getLocalPort());
+
             try{
                 handleClient();
             }catch (IOException e){
