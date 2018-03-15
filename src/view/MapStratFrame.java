@@ -38,19 +38,42 @@ public class MapStratFrame extends JFrame {
         /*menu = new JMenuBar();*/
         JMenu session = new JMenu("Session");
         JMenuItem join = new JMenuItem("Join Session...");
-        join.addActionListener((ActionEvent e) -> {
-            String whatTheUserEntered = JOptionPane.showInputDialog("What session would you like to join?");
-            if (whatTheUserEntered != null) {
-                System.err.println("Joining session: " + whatTheUserEntered);
-            }
-        });
-
         JMenuItem leave = new JMenuItem("Leave Session");
         leave.setEnabled(false);
         session.add(join);
         session.add(leave);
         menu.add(session);
         this.add(menu, BorderLayout.NORTH);
+
+        join.addActionListener((ActionEvent e) -> {
+
+            JTextField server = new JTextField();
+            JTextField group  = new JTextField();
+
+            JPanel querier = new JPanel(new GridLayout(5, 1));
+            querier.add(new JLabel("Server location (host:port):"));
+            querier.add(server);
+            querier.add(Box.createHorizontalStrut(15));
+            querier.add(new JLabel("Session ID (group ID):"));
+            querier.add(group);
+
+            int result = JOptionPane.showConfirmDialog(null, querier, "Connect to a group on a server", JOptionPane.OK_CANCEL_OPTION);
+            if (result == JOptionPane.OK_OPTION) {
+                System.err.println("Joining " + server.getText() + ": " + group.getText());
+                String host = server.getText().split(":")[0];
+                int    port = Integer.parseInt(server.getText().split(":")[1]);
+                String gid  = group.getText();
+                draw.connect(host, port, gid);
+                leave.setEnabled(true);
+                join.setEnabled(false);
+            }
+        });
+
+        leave.addActionListener((ActionEvent e) -> {
+            leave.setEnabled(false);
+            join.setEnabled(true);
+            draw.disconnect();
+        });
 
         /* Create the background map view and add it to this window */
         canvas = new DrawingCanvas(map, draw);
