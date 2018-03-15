@@ -20,9 +20,9 @@ public class Message implements Serializable {
 
     /* Bookkeeping information, Mandatory for all messages that these fields are used */
     @NotNull
-    final MessageType type;
+    public final MessageType type;
     @NotNull
-    final long        gid;
+    public final long        gid;
 
     /* State information, may be null and unused */
     private List<DrawableObject> state;    // For updating a client's state
@@ -63,6 +63,12 @@ public class Message implements Serializable {
     public static Message refresh(String group, List<DrawableObject> state){
         Message m = new Message(MessageType.REFRESH, GroupUtilities.groupIdFromName(group));
         m.state = state;
+        return m;
+    }
+
+    public static Message update(String group, DrawableObject o){
+        Message m = new Message(MessageType.UPDATE, GroupUtilities.groupIdFromName(group));
+        m.newStroke = o;
         return m;
     }
 
@@ -109,6 +115,14 @@ public class Message implements Serializable {
         return newStroke;
     }
 
+    public int getNumPeers(){
+        return numPeers;
+    }
+
+    public List<DrawableObject> getState() {
+        return state;
+    }
+
     @Override
     public String toString(){
         StringBuilder sb = new StringBuilder();
@@ -119,13 +133,30 @@ public class Message implements Serializable {
         sb.append(this.gid);
         sb.append(")\n");
 
-        if(this.type == MessageType.STATUS){
-            sb.append("NumPeers: ");
-            sb.append(numPeers);
-            sb.append("\n");
-        }
+        switch(this.type){
+            case STATUS:
+                sb.append("\tNumPeers: ");
+                sb.append(numPeers);
+                sb.append("\n");
+                break;
 
-        //TODO: If message type == UPDATE or REFRESH append appropriate information
+            case UPDATE:
+                sb.append("\tnewStroke: ");
+                sb.append(newStroke);
+                sb.append("\n");
+                break;
+
+            case REFRESH:
+                sb.append("\tState: ");
+                sb.append(state);
+                sb.append("\n");
+                break;
+
+            case JOIN_GROUP:  // No extra info
+            case LEAVE_GROUP:
+            default:
+                break;
+        }
 
         return sb.toString();
     }

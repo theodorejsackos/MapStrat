@@ -3,7 +3,7 @@ package model;
 import java.awt.*;
 import java.io.Serializable;
 
-public abstract class DrawableObject implements Serializable {
+public abstract class DrawableObject implements Serializable{
     private static int ID_COUNTER = 0;
 
     private final int drawObjectId;
@@ -21,4 +21,5 @@ public abstract class DrawableObject implements Serializable {
     public final boolean is(int id){
         return this.drawObjectId == id;
     }
+
 }

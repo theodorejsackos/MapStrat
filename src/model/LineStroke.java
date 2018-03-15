@@ -74,4 +74,9 @@ public class LineStroke extends DrawableObject {
     public void addStroke(int x, int y){
         stroke.add(new Point(x, y));
     }
+
+    @Override
+    public String toString(){
+        return String.format("(%d px, (%s)){ %s }\n", size, color, stroke);
+    }
 }

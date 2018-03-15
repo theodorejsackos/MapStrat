@@ -10,17 +10,23 @@ public class GroupUtilities {
     }
 
     public static String groupNameFromId(long gid){
-        StringBuilder sb = new StringBuilder(8);
-        for(int i = 0; i < Long.BYTES; i++)
-            sb.append((gid & (0xFF << (i << 3))) >> (i << 3));
-        return sb.toString();
+        char[] result = new char[8];
+        for(int i = Long.BYTES - 1; i >= 0; i--) {
+            long mask   = (0xFFL << (i * 8));
+            long kernel = gid & mask;
+            long LSB    = kernel >> (i * 8);
+            result[i] = (char) LSB;
+        }
+        return new String(result);
     }
 
     public static long groupIdFromName(String gname){
-        long lid  = 0;
-        for(int i = 0; i < Long.BYTES; i++)
-            lid |= gname.charAt(i) << (i << 3);
-        System.out.println(Long.toHexString(lid));
-        return lid;
+        long gid  = 0;
+        for(int i = 0; i < Long.BYTES; i++) {
+            char c     = gname.charAt(i);
+            long moved = ((long) c) << (i * 8);
+            gid       |= moved;
+        }
+        return gid;
     }
 }

@@ -59,10 +59,10 @@ public class MapStratFrame extends JFrame {
 
             int result = JOptionPane.showConfirmDialog(null, querier, "Connect to a group on a server", JOptionPane.OK_CANCEL_OPTION);
             if (result == JOptionPane.OK_OPTION) {
-                System.err.println("Joining " + server.getText() + ": " + group.getText());
                 String host = server.getText().split(":")[0];
                 int    port = Integer.parseInt(server.getText().split(":")[1]);
                 String gid  = group.getText();
+
                 draw.connect(host, port, gid);
                 leave.setEnabled(true);
                 join.setEnabled(false);

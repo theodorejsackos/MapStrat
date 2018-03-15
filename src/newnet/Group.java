@@ -12,17 +12,17 @@ public class Group {
     private String gid;
     private int numPeers;
 
-    private Set<Host> clients;
+    private List<Host> clients;
     private List<DrawableObject> state;
 
     public Group(String groupId){
         this.gid = groupId;
         this.numPeers = 0;
-        this.clients  = new TreeSet<>();
+        this.clients  = new ArrayList<>();
         this.state    = new ArrayList<>();
     }
 
-    public void addMember(Host h){
+    public synchronized void addMember(Host h){
         peerAdded();
         clients.add(h);
     }
@@ -39,19 +39,20 @@ public class Group {
         numPeers--;
     }
 
-    public void drop(Host client) throws IOException {
+    public synchronized void drop(Host client) throws IOException {
         peerRemoved();
         clients.remove(client);
         client.close();
     }
 
-    public void updateState(DrawableObject o){
-        state.add(o);
-        updateBroadcast();
-    }
-
     public void updateUnicast(Host client){
         Message.refresh(gid, state).send(client);
+    }
+
+    public void updateState(DrawableObject o){
+        state.add(o);
+        System.out.println(state);
+        updateBroadcast();
     }
 
     public void updateBroadcast(){

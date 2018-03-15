@@ -1,6 +1,7 @@
 package model;
 
 import newnet.Host;
+import newnet.Message;
 
 import java.awt.*;
 import java.io.IOException;
@@ -18,7 +19,7 @@ import java.util.Observable;
  * @author Theodore Sackos (theodorejsackos@email.arizona.edu)
  * @see view.DrawingCanvas
  */
-public class DrawModel extends Observable{
+public class DrawModel extends Observable {
 
     public static final int BRUSH_SIZE_MINIMUM = 1, BRUSH_SIZE_MAXIMUM = 10;
 
@@ -28,8 +29,9 @@ public class DrawModel extends Observable{
     private Color      selectedColor;
     private LineStroke currentStroke; // The stroke that is currently being drawn (null if not in use)
 
-    private boolean connected           = false;
+    private volatile boolean connected  = false;
     private ServerHandler serverHandler = null;
+    private int           numPeers      = 0;
 
     /* Default initialize a larger than normal list of drawable objects, the color to red, and the
      * brush size to 1px */
@@ -85,24 +87,36 @@ public class DrawModel extends Observable{
     /* When the stroke has been completed, return the intance stroke to null (the stroke's reference will live on
      * in the list of drawable objects, but will not be changed again */
     public void finalizeStroke(){
+        if(connected)
+            serverHandler.updateServer(currentStroke);
         currentStroke = null;
     }
 
 
     public void connect(String host, int port, String gid){
-        try {
-            Host drawServer = new Host(host, port);
-            drawServer.ois = new ObjectInputStream(drawServer.getInputStream());
-            drawServer.oos = new ObjectOutputStream(drawServer.getOutputStream());
-            drawServer.id = gid;
 
-            connected = true;
-            serverHandler = new ServerHandler(drawServer);
-            serverHandler.start();
+        /* Do connect to server asynchronously to not screw with the GUI interactiveness */
+        new Thread(new Runnable(){
+            @Override
+            public void run() {
+                Host drawServer = null;
+                try {
+                    drawServer = new Host(host, port, gid);
+                }catch(IOException e){
+                    System.err.println("Failed to establish a connection to " + host + ":" + port);
+                    e.printStackTrace();
+                }
 
-        }catch(IOException e){
-            System.err.println("Failed to establish a connection to " + host + ":" + port);
-        }
+                System.err.printf("Joining '%s':'%d' [%s]\n", host, port, gid);
+
+                /* Request to join the specified group */
+                Message.join(gid).send(drawServer);
+                connected = true;
+
+                serverHandler = new ServerHandler(drawServer, gid);
+                serverHandler.start();
+            }
+        }).start();
     }
 
     public void disconnect(){
@@ -116,22 +130,65 @@ public class DrawModel extends Observable{
 
     private class ServerHandler extends Thread{
         private Host server;
-        private volatile boolean running;
+        private String gid;
 
-        public ServerHandler(Host server) {
+        public ServerHandler(Host server, String gid) {
             this.server  = server;
-            this.running = true;
+            this.gid = gid;
         }
 
         @Override
         public void run(){
-            while(running){
+            System.err.println("Awaiting messages from server in ServerHandler");
+            while(connected){
+                Message m = Message.get(server);
+                if(m == null) {
+                    System.err.println("Garbage message received from " + server + " severing connection.");
+                    connected = false;
+                    drawnObjects = new ArrayList<>();
+                    setChanged();
+                    notifyObservers();
+                    continue;
+                }
 
+                System.err.printf("[Group %s]: Server handler received ", gid);
+                switch(m.type){
+                    case JOIN_GROUP:
+                        System.err.println("JOIN_GROUP message");
+                        break;
+                    case LEAVE_GROUP:
+                        System.err.println("LEAVE_GROUP message");
+                        break;
+                    case STATUS:
+                        System.err.println("STATUS message");
+                        /* This is either the first response from the server or a generic 'we are still connected' message */
+                        connected = true;
+                        numPeers = m.getNumPeers();
+                        break;
+                    case UPDATE:
+                        System.err.println("UPDATE message");
+                        break;
+                    case REFRESH:
+                        System.err.println("REFRESH message");
+                        drawnObjects = m.getState();
+                        System.out.println(m.getState());
+                        setChanged();
+                        notifyObservers();
+                        break;
+                }
             }
         }
 
         public void stopRunning(){
-            running = false;
+            connected = false;
+        }
+
+        public void updateServer(DrawableObject o){
+            Message.update(gid, o).send(server);
+        }
+
+        public void refresh(){
+            Message.refresh(gid, null).send(server);
         }
     }
 }
