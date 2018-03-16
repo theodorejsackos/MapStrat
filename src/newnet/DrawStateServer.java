@@ -3,8 +3,6 @@ package newnet;
 import util.GroupUtilities;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Arrays;
@@ -23,7 +21,7 @@ public class DrawStateServer extends ServerSocket implements Runnable{
     }
 
     private DrawStateServer(int port) throws IOException {
-        super(port);
+        super(8080);
         sessions = new ConcurrentHashMap<>();
         new Thread(this).start();
     }
@@ -116,9 +114,10 @@ public class DrawStateServer extends ServerSocket implements Runnable{
 
                         /* Respond to the client with a status message indicating that the group join was successful */
                         System.err.println("Responding with STATUS to client connecting to group " + client.id);
-                        Message status = Message.status(client.id, group.getNumPeers());
-                        status.send(client);
+                        group.statusBroadcast();
 
+                        /* Inform this particular client of the current group drawing state */
+                        group.refreshUnicast(client);
                         break;
                     case LEAVE_GROUP:
                         System.err.println("LEAVE_GROUP message");
@@ -132,11 +131,13 @@ public class DrawStateServer extends ServerSocket implements Runnable{
                         break;
                     case UPDATE:
                         System.err.println("UPDATE message");
+                        for(String key : sessions.keySet())
+                            System.out.printf("%s -> %s\n", key, sessions.get(key));
                         group.updateState(m.getStroke());
                         break;
                     case REFRESH: // Client requesting most up-to date drawing state
                         System.err.println("REFRESH message");
-                        group.updateUnicast(client);
+                        group.refreshUnicast(client);
                         break;
                 }
             }

@@ -59,8 +59,10 @@ public class MapStratFrame extends JFrame {
 
             int result = JOptionPane.showConfirmDialog(null, querier, "Connect to a group on a server", JOptionPane.OK_CANCEL_OPTION);
             if (result == JOptionPane.OK_OPTION) {
-                String host = server.getText().split(":")[0];
-                int    port = Integer.parseInt(server.getText().split(":")[1]);
+
+                //TODO: How will this be handeled? Ideally don't put this responsibility on the user, just connect to a  well-known domain and port
+                String host = server.getText();//.split(":")[0];
+                int    port = 8080;//Integer.parseInt(server.getText().split(":")[1]);
                 String gid  = group.getText();
 
                 draw.connect(host, port, gid);

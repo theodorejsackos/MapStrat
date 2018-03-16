@@ -19,9 +19,7 @@ import java.util.List;
 public class Message implements Serializable {
 
     /* Bookkeeping information, Mandatory for all messages that these fields are used */
-    @NotNull
     public final MessageType type;
-    @NotNull
     public final long        gid;
 
     /* State information, may be null and unused */
@@ -82,7 +80,9 @@ public class Message implements Serializable {
 
     public void send(Host to){
         try{
+            System.out.println("To " + to + ":\n\t" + this);
             to.oos.writeObject(this);
+            to.oos.flush();
         } catch (IOException e){
             System.err.println("Failed to send to destination in group " + to.id);
             System.err.println("Intended message: '" + this.toString() + "'");

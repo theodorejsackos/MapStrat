@@ -3,10 +3,7 @@ package newnet;
 import model.DrawableObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 public class Group {
     private String gid;
@@ -15,11 +12,25 @@ public class Group {
     private List<Host> clients;
     private List<DrawableObject> state;
 
+    private long lastBroadcast;
+    private final int BROADCAST_LIMITER_MILIS = 250;
+
     public Group(String groupId){
         this.gid = groupId;
         this.numPeers = 0;
         this.clients  = new ArrayList<>();
-        this.state    = new ArrayList<>();
+        this.state    = Collections.synchronizedList(new ArrayList<>());
+        lastBroadcast = System.currentTimeMillis();
+    }
+
+    /* broadcastAllowed() -- rate-limits broadcasts to all group members to at most
+    * 4 times per second.*/
+    public boolean broadcastAllowed(){
+        if(System.currentTimeMillis() - lastBroadcast < BROADCAST_LIMITER_MILIS)
+            return false;
+
+        lastBroadcast = System.currentTimeMillis();
+        return true;
     }
 
     public synchronized void addMember(Host h){
@@ -45,17 +56,25 @@ public class Group {
         client.close();
     }
 
-    public void updateUnicast(Host client){
+    /* Update all members with the newest group membership information -- number of peers in particular */
+    public void statusBroadcast(){
+        Message s = Message.status(gid, numPeers);
+
+        for(Host client : clients)
+            s.send(client);
+    }
+
+    public void refreshUnicast(Host client){
         Message.refresh(gid, state).send(client);
     }
 
     public void updateState(DrawableObject o){
         state.add(o);
         System.out.println(state);
-        updateBroadcast();
+        refreshBroadcast();
     }
 
-    public void updateBroadcast(){
+    public void refreshBroadcast(){
         Message m = Message.refresh(gid, state);
 
         for(Host client : clients)
