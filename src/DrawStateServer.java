@@ -1,5 +1,7 @@
-package newnet;
 
+import newnet.Group;
+import newnet.Host;
+import newnet.Message;
 import util.GroupUtilities;
 
 import java.io.IOException;

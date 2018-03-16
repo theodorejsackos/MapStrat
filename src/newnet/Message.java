@@ -1,11 +1,9 @@
 package newnet;
 
-import com.sun.istack.internal.NotNull;
 import model.DrawableObject;
 import util.GroupUtilities;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.List;
 
