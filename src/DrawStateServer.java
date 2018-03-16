@@ -90,10 +90,10 @@ public class DrawStateServer extends ServerSocket implements Runnable{
                     continue;
                 }
 
-                System.err.printf("[Group %s]: Client handler received ", client.id);
+                //System.err.printf("[Group %s]: Client handler received ", client.id);
                 switch(m.type){
                     case JOIN_GROUP:
-                        System.err.println("JOIN_GROUP message");
+                        //System.err.println("JOIN_GROUP message");
 
                         /* Get the group ID that the client is trying to connect to */
                         client.setGroup(GroupUtilities.groupNameFromId(m.gid));
@@ -101,12 +101,10 @@ public class DrawStateServer extends ServerSocket implements Runnable{
                         /* Check the group membership status */
                         String gid = client.id;
                         if (sessions.containsKey(gid)){
-
                             /* If the group already exists, add the connecting client to that group */
                             sessions.get(gid).addMember(client);
                             group = sessions.get(gid);
-                        }else {
-
+                        } else {
                             /* If the group does not yet exist, create it then add the connecting client to it */
                             Group g = new Group(client.id);
                             g.addMember(client);
@@ -122,23 +120,21 @@ public class DrawStateServer extends ServerSocket implements Runnable{
                         group.refreshUnicast(client);
                         break;
                     case LEAVE_GROUP:
-                        System.err.println("LEAVE_GROUP message");
+                        //System.err.println("LEAVE_GROUP message");
                         /* Notify the client that they have left the group (numpeers = 0) */
                         Message.status(client.id, 0).send(client);
                         /* Remove the client from the group and close the connection */
                         group.drop(client);
                         break;
                     case STATUS:
-                        System.err.println("STATUS message");
+                        //System.err.println("STATUS message");
                         break;
                     case UPDATE:
-                        System.err.println("UPDATE message");
-                        for(String key : sessions.keySet())
-                            System.out.printf("%s -> %s\n", key, sessions.get(key));
+                        //System.err.println("UPDATE message");
                         group.updateState(m.getStroke());
                         break;
                     case REFRESH: // Client requesting most up-to date drawing state
-                        System.err.println("REFRESH message");
+                        //System.err.println("REFRESH message");
                         group.refreshUnicast(client);
                         break;
                 }

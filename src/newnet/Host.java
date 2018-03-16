@@ -5,7 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-public class Host implements Comparable<Host>{
+public class Host {
     public Socket socket;
     public ObjectInputStream ois;
     public ObjectOutputStream oos;
@@ -43,16 +43,8 @@ public class Host implements Comparable<Host>{
     }
 
     @Override
-    public int compareTo(Host o) {
-        if(this.socket.equals(o.socket))
-            return 0;
-        else
-            return this.id.compareTo(o.id);
-    }
-
-    @Override
     public String toString(){
-        return socket.toString() + "[" + id + "]";
+        return socket.toString() + " in group " + id;
     }
 }
 

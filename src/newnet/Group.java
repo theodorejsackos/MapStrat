@@ -6,11 +6,11 @@ import java.io.IOException;
 import java.util.*;
 
 public class Group {
-    private String gid;
+    private final String gid;
     private int numPeers;
 
-    private List<Host> clients;
-    private List<DrawableObject> state;
+    private final List<Host> clients;
+    private final List<DrawableObject> state;
 
     private long lastBroadcast;
     private final int BROADCAST_LIMITER_MILIS = 250;
@@ -18,7 +18,7 @@ public class Group {
     public Group(String groupId){
         this.gid = groupId;
         this.numPeers = 0;
-        this.clients  = new ArrayList<>();
+        this.clients  = Collections.synchronizedList(new ArrayList<>());
         this.state    = Collections.synchronizedList(new ArrayList<>());
         lastBroadcast = System.currentTimeMillis();
     }
@@ -33,12 +33,12 @@ public class Group {
         return true;
     }
 
-    public synchronized void addMember(Host h){
+    public void addMember(Host h){
         peerAdded();
         clients.add(h);
     }
 
-    public int  getNumPeers(){
+    public synchronized int getNumPeers(){
         return numPeers;
     }
 
@@ -50,7 +50,7 @@ public class Group {
         numPeers--;
     }
 
-    public synchronized void drop(Host client) throws IOException {
+    public void drop(Host client) throws IOException {
         peerRemoved();
         clients.remove(client);
         client.close();
@@ -58,6 +58,9 @@ public class Group {
 
     /* Update all members with the newest group membership information -- number of peers in particular */
     public void statusBroadcast(){
+        //if(!broadcastAllowed())
+        //    return;
+
         Message s = Message.status(gid, numPeers);
 
         for(Host client : clients)
@@ -70,14 +73,15 @@ public class Group {
 
     public void updateState(DrawableObject o){
         state.add(o);
-        System.out.println(state);
         refreshBroadcast();
     }
 
     public void refreshBroadcast(){
-        Message m = Message.refresh(gid, state);
+        //if(!broadcastAllowed())
+        //    return;
 
-        for(Host client : clients)
-            m.send(client);
+        for(Host client : clients) {
+            refreshUnicast(client);
+        }
     }
 }

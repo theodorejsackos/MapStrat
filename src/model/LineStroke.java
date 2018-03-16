@@ -4,6 +4,8 @@ package model;
 import util.CoordinateUtilities;
 
 import java.awt.*;
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -19,7 +21,7 @@ import java.util.List;
  * @see model.DrawModel
  * @see controller.MapDrawListener
  */
-public class LineStroke extends DrawableObject {
+public class LineStroke extends DrawableObject implements Serializable {
 
     /* The sequence of points that form the stroke  */
     private List<Point> stroke;
@@ -32,7 +34,7 @@ public class LineStroke extends DrawableObject {
         super();
         this.color = color;
         this.size = size;
-        stroke = new LinkedList<>();
+        stroke = new ArrayList<>();
     }
 
     /** renderRelativeToKernel -- The line being drawn should be appropriately scaled
@@ -77,6 +79,19 @@ public class LineStroke extends DrawableObject {
 
     @Override
     public String toString(){
-        return String.format("(%d px, (%s)){ %s }\n", size, color, stroke);
+        StringBuilder sb = new StringBuilder(100);
+        sb.append("LineStroke(");
+        sb.append(size);
+        sb.append(", [");
+        sb.append(color.getRed());
+        sb.append(", ");
+        sb.append(color.getGreen());
+        sb.append(", ");
+        sb.append(color.getBlue());
+        sb.append("], ");
+        sb.append(stroke.size());
+        sb.append(" points");
+        sb.append(" )");
+        return sb.toString();
     }
 }

@@ -120,12 +120,14 @@ public class DrawModel extends Observable {
     }
 
     public void disconnect(){
-        serverHandler.stopRunning();
-        try {
-            serverHandler.join();
-        }catch(InterruptedException e){
-            System.err.println("Interrupted while waiting for ServerHandler to join");
-        }
+        new Thread(() -> {
+            serverHandler.stopRunning();
+            try {
+                serverHandler.join();
+            }catch(InterruptedException e){
+                System.err.println("Interrupted while waiting for ServerHandler to join");
+            }
+        }).start();
     }
 
     private class ServerHandler extends Thread{
@@ -144,34 +146,33 @@ public class DrawModel extends Observable {
                 Message m = Message.get(server);
                 if(m == null) {
                     System.err.println("Garbage message received from " + server + " severing connection.");
-                    connected = false;
+                    connected    = false;
                     drawnObjects = new ArrayList<>();
                     setChanged();
                     notifyObservers();
                     continue;
                 }
 
-                System.err.printf("[Group %s]: Server handler received ", gid);
+                //System.err.printf("[Group %s]: Server handler received ", gid);
                 switch(m.type){
                     case JOIN_GROUP:
-                        System.err.println("JOIN_GROUP message");
+                        //System.err.println("JOIN_GROUP message");
                         break;
                     case LEAVE_GROUP:
-                        System.err.println("LEAVE_GROUP message");
+                        //System.err.println("LEAVE_GROUP message");
                         break;
                     case STATUS:
-                        System.err.println("STATUS message");
+                        //.err.println("STATUS message");
                         /* This is either the first response from the server or a generic 'we are still connected' message */
                         connected = true;
                         numPeers = m.getNumPeers();
                         break;
                     case UPDATE:
-                        System.err.println("UPDATE message");
+                        //System.err.println("UPDATE message");
                         break;
                     case REFRESH:
-                        System.err.println("REFRESH message");
+                        //System.err.println("REFRESH message");
                         drawnObjects = m.getState();
-                        System.out.println(m.getState());
                         setChanged();
                         notifyObservers();
                         break;

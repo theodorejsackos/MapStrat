@@ -21,9 +21,9 @@ public class Message implements Serializable {
     public final long        gid;
 
     /* State information, may be null and unused */
-    private List<DrawableObject> state;    // For updating a client's state
-    private DrawableObject       newStroke;  // For adding to the server's state
-    private int                  numPeers; // For status update messages (session/group information).
+    private List<DrawableObject> state;     // For updating a client's state
+    private DrawableObject       newStroke; // For adding to the server's state
+    private int                  numPeers;  // For status update messages (session/group information).
 
     private Message(MessageType t, long gid){
         this.type = t;
@@ -70,15 +70,21 @@ public class Message implements Serializable {
 
     public static Message get(Host from){
         try{
-            return (Message) from.ois.readObject();
+            Message m = (Message) from.ois.readObject();
+            System.out.print("Message.get() from " + from + ":\n\t");
+            System.out.println(m);
+            System.out.flush();
+            return m;
         } catch (IOException | ClassNotFoundException e){
+            e.printStackTrace();
             return null;
         }
     }
 
     public void send(Host to){
         try{
-            System.out.println("To " + to + ":\n\t" + this);
+            System.out.println("Message.send() to " + to + ":\n\t" + this);
+            System.out.flush();
             to.oos.writeObject(this);
             to.oos.flush();
         } catch (IOException e){
@@ -125,7 +131,7 @@ public class Message implements Serializable {
     public String toString(){
         StringBuilder sb = new StringBuilder();
         sb.append(this.type.name());
-        sb.append(": ");
+        sb.append(": group ");
         sb.append(GroupUtilities.groupNameFromId(this.gid));
         sb.append(" (");
         sb.append(this.gid);
@@ -146,8 +152,13 @@ public class Message implements Serializable {
 
             case REFRESH:
                 sb.append("\tState: ");
-                sb.append(state);
-                sb.append("\n");
+                sb.append(state.size());
+                sb.append(" drawable objects. [");
+                for(int i = 0; i < Math.min(3, state.size()); i++){
+                    sb.append(state.get(i));
+                    sb.append(", ");
+                }
+                sb.append("]\n");
                 break;
 
             case JOIN_GROUP:  // No extra info
