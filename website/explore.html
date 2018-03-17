@@ -11,9 +11,9 @@
 
     <div class="bubble" id="nav">
     <ul>
-        <li class="highlight"> <a href="mapgee.us"> MapStrat </a>
-        <li class="highlight"> <a href="mapgee.us/explore">  &nbsp;&nbsp; Explore </a>
-        <li class="highlight"> <a href="mapgee.us/download"> &nbsp;&nbsp; Download </a>
+        <li class="highlight"> <a href="index.html"> MapStrat </a>
+        <li class="highlight"> <a href="explore.html">  &nbsp;&nbsp; Explore </a>
+        <li class="highlight"> <a href="download.html"> &nbsp;&nbsp; Download </a>
     </ul>
 
     <ul>
@@ -29,12 +29,21 @@
         <h2> What is MapStrat? </h2>
         <p> MapStrat is a drawing application built around the Player Unknown's Battlegrounds (PUBG) map. It allows teams to
             strategize and discuss positions, player locations, and general game strategy before or after a game ends. </p>
+        <div id="demoContainer">
+            <img src="full_icon.png"/>
+            <video autoplay loop>
+                <source src="demo.mp4" type="video/mp4">
+                Your browser does not support the HTML5 video tag. 
+            </video>
+        </div>
 
         <h2> How does it work? </h2>
         <p> When you launch a MapStrat client you have a private drawing canvas. Use the menu bar to select "Session -> 
             Join Session ..." which will open a dialog for you to enter a group. Once connected, everyone connected to that 
             group will share the same drawing canvas. You can draw positions, movements, and other ideas on the map while you
-            debrief with your team. </p>
+            debrief with your team. When new members join the group they will receive all markings on the map. When all group
+            members leave the session; all markings will be deleted and rejoining the session will produce an empty map.</p>
+        
     </div>
 
 </body>
