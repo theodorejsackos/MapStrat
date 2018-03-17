@@ -23,6 +23,8 @@ import java.util.List;
  */
 public class LineStroke extends DrawableObject implements Serializable {
 
+    static final long serialVersionUID = 000000000000000001;
+
     /* The sequence of points that form the stroke  */
     private List<Point> stroke;
 
