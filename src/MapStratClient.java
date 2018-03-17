@@ -3,6 +3,7 @@ import model.MapModel;
 import model.SessionModel;
 import view.MapStratFrame;
 
+import javax.swing.*;
 import java.awt.*;
 
 /** The MapStratClient initializes and displays the MapStratFrame on the main thread, then exits.
@@ -37,6 +38,22 @@ public class MapStratClient {
 
         MapModel  mapModel     = new MapModel(MapModel.MAP_DEFAULT);
         DrawModel drawModel    = new DrawModel();
+
+                /* Use the current OS's Look and feel */
+        try{
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        }catch (UnsupportedLookAndFeelException e) {
+            // handle exception
+        }
+        catch (ClassNotFoundException e) {
+            // handle exception
+        }
+        catch (InstantiationException e) {
+            // handle exception
+        }
+        catch (IllegalAccessException e) {
+            // handle exception
+        }
 
         MapStratFrame window = new MapStratFrame(mapModel, drawModel);
         window.setVisible(true);

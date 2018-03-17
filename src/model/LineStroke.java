@@ -22,7 +22,7 @@ import java.util.List;
  * @see controller.MapDrawListener
  */
 public class LineStroke extends DrawableObject implements Serializable {
-    
+
     /* The sequence of points that form the stroke  */
     private List<Point> stroke;
 

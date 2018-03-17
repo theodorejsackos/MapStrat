@@ -171,55 +171,7 @@ public class ControlPanel extends JPanel implements Observer{
     public void update(Observable o, Object arg) {
         sizeSlider.setValue(drawModel.getSize());
         colorButton.setBackground(drawModel.getColor());
+
         this.repaint();
-    }
-
-    /* Almost working, can't quite get the labels for the sliders removed */
-    private void initializeJColorChooserPanelWithoutSlidersOrPreviewPanel(){
-        /*
-        JColorChooser jcc = new JColorChooser(new Color(255, 0, 0));
-
-        // Get the color selection panels that are displayed in the tab view
-        AbstractColorChooserPanel[] panels = jcc.getChooserPanels();
-
-        // remove all tabs except the Hue-Saturation-Value (previous to JRE 7 this was called HSB for HS-brightness
-        for(AbstractColorChooserPanel panel : panels)
-            if(!"HSV".equals(panel.getDisplayName()))
-                jcc.removeChooserPanel(panel);
-
-        try {
-            AbstractColorChooserPanel cp = jcc.getChooserPanels()[0];
-
-            Field f = cp.getClass().getDeclaredField("panel");
-            f.setAccessible(true);
-
-            Object colorPanel = f.get(cp);
-            Field f2 = colorPanel.getClass().getDeclaredField("spinners");
-            f2.setAccessible(true);
-            Object spinners = f2.get(colorPanel);
-
-            for(int i = 0; i < Array.getLength(spinners); i++){
-                Object transpSlispinner = Array.get(spinners, i);
-                Field f3 = transpSlispinner.getClass().getDeclaredField("slider");
-                f3.setAccessible(true);
-                JSlider slider = (JSlider) f3.get(transpSlispinner);
-                ((JPanel) colorPanel).remove(slider);
-
-                slider.setEnabled(false);
-                Field f4 = transpSlispinner.getClass().getDeclaredField("spinner");
-                f4.setAccessible(true);
-                JSpinner spinner = (JSpinner) f4.get(transpSlispinner);
-                ((JPanel) colorPanel).remove(spinner);
-            }
-        }catch(NoSuchFieldException e){
-            System.out.println("NoSuch");
-            e.printStackTrace();
-        }catch(IllegalAccessException e){
-            System.out.println("IllegalAccess");
-            e.printStackTrace();
-        }
-        jcc.setPreviewPanel(new JPanel());
-        this.add(jcc);
-        */
     }
 }

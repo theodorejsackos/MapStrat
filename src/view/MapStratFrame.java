@@ -7,10 +7,13 @@ import model.DrawModel;
 import model.MapModel;
 import model.SessionModel;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentEvent;
+import java.io.File;
+import java.io.IOException;
 
 /** The MapStratFrame is the top-level window container for the applicataion's view elements.
  * The MapStratFrame contains a drawable, scrollable, zoomable canvas displaying a portion
@@ -30,6 +33,17 @@ public class MapStratFrame extends JFrame {
     private ControlPanel  control;
 
     public MapStratFrame(MapModel map, DrawModel draw){
+
+        /* Set the frame icon */
+        //new Thread(() -> {
+            try {
+                setIconImage(ImageIO.read(new File("res/MapStratIcon.png")));
+                repaint();
+            } catch (IOException e) {
+                System.err.println("Failed to load image icon");
+            }
+        //}).start();
+
         /* Create the Menu Bar and the Session menu option */
         menu = new JMenuBar();
 
@@ -98,6 +112,8 @@ public class MapStratFrame extends JFrame {
         this.addMouseListener(new MapDrawListener(map, draw, canvas)); // Listen to drawing events (left clicks)
         this.addMouseListener(mapControl);
         this.addMouseMotionListener(mapControl);
+
+        canvas.requestFocus();
     }
 
     public JPanel getDrawingCanvas(){

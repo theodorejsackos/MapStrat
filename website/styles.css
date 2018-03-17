@@ -1,7 +1,6 @@
 
 body {
     margin: 8px;
-    font-family: sans-serif;
 }
 
 #nav {
@@ -11,7 +10,6 @@ body {
     color: white;
     left: 1em;
     text-align: left;
-    height: 40em;
     font-size: 10pt;
 }
 
@@ -43,16 +41,16 @@ body {
 /* Top of page colored banner */
 .banner {
     background-color: #DBDE84;
+    font-family: sans-serif;
 }
 
 /* MapStrat header */
 .banner > h1 {
-    font-family: sans-serif;
     font-size: 46pt;
     padding-left: 8px;
     margin-top: 4px;
     margin-bottom: 4px;
-    color: #305C35;
+    font-family: sans-serif;
 }
 
 /* Slogan */
@@ -64,12 +62,17 @@ body {
     font-family: serif;
 }
 
+h1, h2, h3, h4, h5, h6 {
+    color: #305C35;
+}
+
 .bubble {
     border-radius: 8px;
     padding: 4px;
 }
 
 a {
+    font-family: sans-serif;
     text-decoration: none;
     color: black;
 }
