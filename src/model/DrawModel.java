@@ -94,8 +94,8 @@ public class DrawModel extends Observable {
     }
 
 
-    public void connect(String host, int port, String gid){
-
+    public void connect(int port, String gid){
+        final String host = "52.179.80.227";
         /* Do connect to server asynchronously to not screw with the GUI interactiveness */
         new Thread(new Runnable(){
             @Override

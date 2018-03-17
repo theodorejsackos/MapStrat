@@ -30,8 +30,6 @@ public class MapStratFrame extends JFrame {
     private ControlPanel  control;
 
     public MapStratFrame(MapModel map, DrawModel draw){
-
-
         /* Create the Menu Bar and the Session menu option */
         menu = new JMenuBar();
 
@@ -47,25 +45,22 @@ public class MapStratFrame extends JFrame {
 
         join.addActionListener((ActionEvent e) -> {
 
-            JTextField server = new JTextField();
-            JTextField group  = new JTextField();
+            GroupTextField group  = new GroupTextField("https://mapgee.us/GROUP_ID");
 
             JPanel querier = new JPanel(new GridLayout(5, 1));
-            querier.add(new JLabel("Server location (host:port):"));
-            querier.add(server);
-            querier.add(Box.createHorizontalStrut(15));
-            querier.add(new JLabel("Session ID (group ID):"));
+            querier.add(new JLabel("Enter a group invite link or group ID. They will look something like:"));
+            querier.add(new JLinkLabel("mapgee.us/jAbfHa"));
+            querier.add(new JLinkLabel("jAbfHa"));
+            querier.add(Box.createVerticalStrut(5));
             querier.add(group);
 
             int result = JOptionPane.showConfirmDialog(null, querier, "Connect to a group on a server", JOptionPane.OK_CANCEL_OPTION);
             if (result == JOptionPane.OK_OPTION) {
 
-                //TODO: How will this be handeled? Ideally don't put this responsibility on the user, just connect to a  well-known domain and port
-                String host = server.getText();//.split(":")[0];
-                int    port = 8080;//Integer.parseInt(server.getText().split(":")[1]);
+                int    port = 8080;
                 String gid  = group.getText();
 
-                draw.connect(host, port, gid);
+                draw.connect(port, gid);
                 leave.setEnabled(true);
                 join.setEnabled(false);
             }
