@@ -169,10 +169,7 @@ public class DrawModel extends Observable {
                         break;
                     case UPDATE:
                         //System.err.println("UPDATE message");
-                        break;
-                    case REFRESH:
-                        //System.err.println("REFRESH message");
-                        drawnObjects = m.getState();
+                        drawnObjects.add(m.getStroke());
                         setChanged();
                         notifyObservers();
                         break;

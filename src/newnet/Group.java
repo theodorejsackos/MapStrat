@@ -73,15 +73,9 @@ public class Group {
 
     public void updateState(DrawableObject o){
         state.add(o);
-        refreshBroadcast();
-    }
 
-    public void refreshBroadcast(){
-        //if(!broadcastAllowed())
-        //    return;
-
-        for(Host client : clients) {
-            refreshUnicast(client);
+        for(Host client : clients){
+            Message.update(gid, o).send(client);
         }
     }
 }

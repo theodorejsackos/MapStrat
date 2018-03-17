@@ -17,15 +17,9 @@ public class Host {
         ois    = new ObjectInputStream(socket.getInputStream());
     }
 
-    public Host(Socket s, String group) throws IOException {
-        this(s);
-        id = group;
-    }
-
     public Host(String host, int port) throws IOException {
         this(new Socket(host, port));
     }
-
 
     public Host(String host, int port, String group) throws IOException {
         this(host, port);

@@ -133,10 +133,6 @@ public class DrawStateServer extends ServerSocket implements Runnable{
                         //System.err.println("UPDATE message");
                         group.updateState(m.getStroke());
                         break;
-                    case REFRESH: // Client requesting most up-to date drawing state
-                        //System.err.println("REFRESH message");
-                        group.refreshUnicast(client);
-                        break;
                 }
             }
         }
