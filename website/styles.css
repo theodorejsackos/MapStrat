@@ -77,24 +77,12 @@ a {
     color: black;
 }
 
-#demoContainer {
+#demoVideo {
     width: 100%;
-    height: 446px;
-    padding: 5px;
 }
 
-#demoContainer > img {
-    position: absolute;
-    margin-left: 5px;
-    left: 0px;
-    top: 46%;
-    width: 25%;
-}
-
-#demoContainer > video {
-    position: relative;
-    margin-left: 5px;
-    left: 25%;
-    width: 75%;
+#demoVideo > video {
+    display: inline-block;
+    margin: 0 auto;
 }
 
