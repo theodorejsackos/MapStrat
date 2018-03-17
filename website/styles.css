@@ -76,13 +76,3 @@ a {
     text-decoration: none;
     color: black;
 }
-
-#demoVideo {
-    width: 100%;
-}
-
-#demoVideo > video {
-    display: inline-block;
-    margin: 0 auto;
-}
-

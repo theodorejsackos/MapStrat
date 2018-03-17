@@ -69,7 +69,7 @@ public class MapModel extends Observable {
         ringAnimator = new Timer(200, (ActionEvent e) -> {
             if(loadingRing == null){
                 try{
-                    loadingRing = ImageIO.read(new File("res/loading.png"));
+                    loadingRing = ImageIO.read(getClass().getResource("/loading.png"));
                 }catch(IOException ex){
                     System.err.printf("The loading ring 'res/%s' could not be loaded.\n", "res/loading.png");
                     loadingRing = new BufferedImage(1, 1, BufferedImage.TYPE_BYTE_GRAY);
@@ -87,16 +87,16 @@ public class MapModel extends Observable {
         kernelSize = kernelX = kernelY = -1;
     }
 
-    private static void cacheBackground(int selected){
-        String mapPath = "res/" + supportedMaps.get(selected);
+    private void cacheBackground(int selected){
+        String mapPath = "/" + supportedMaps.get(selected);
         switch(selected){
             case MAP_DEFAULT:
                 if(cachedDefault != null)
                     return;
                 try{
-                    cachedDefault = ImageIO.read(new File(mapPath));
+                    cachedDefault = ImageIO.read(getClass().getResource(mapPath));
                 }catch(IOException e){
-                    System.err.printf("The default map 'res/%s' could not be loaded.\n", mapPath);
+                    System.err.printf("The default map '%s' could not be loaded.\n", mapPath);
                     cachedDefault = new BufferedImage(SIZE, SIZE, BufferedImage.TYPE_INT_RGB);
                 }
                 break;
@@ -104,9 +104,9 @@ public class MapModel extends Observable {
                 if(cachedGis != null)
                     return;
                 try{
-                    cachedGis = ImageIO.read(new File(mapPath));
+                    cachedGis = ImageIO.read(getClass().getResource(mapPath));
                 }catch(IOException e){
-                    System.err.printf("The GIS map 'res/%s' could not be loaded.\n", mapPath);
+                    System.err.printf("The GIS map '%s' could not be loaded.\n", mapPath);
                     cachedGis = new BufferedImage(SIZE, SIZE, BufferedImage.TYPE_INT_RGB);
                 }
                 break;
@@ -115,9 +115,9 @@ public class MapModel extends Observable {
                 if(cachedTopo != null)
                     return;
                 try{
-                    cachedTopo = ImageIO.read(new File(mapPath));
+                    cachedTopo = ImageIO.read(getClass().getResource(mapPath));
                 }catch(IOException e){
-                    System.err.printf("The topology map 'res/%s' could not be loaded.\n", mapPath);
+                    System.err.printf("The topology map '%s' could not be loaded.\n", mapPath);
                     cachedTopo = new BufferedImage(SIZE, SIZE, BufferedImage.TYPE_INT_RGB);
                 }
                 break;

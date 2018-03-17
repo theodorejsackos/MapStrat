@@ -37,7 +37,7 @@ public class MapStratFrame extends JFrame {
         /* Set the frame icon */
         //new Thread(() -> {
             try {
-                setIconImage(ImageIO.read(new File("res/MapStratIcon.png")));
+                setIconImage(ImageIO.read(getClass().getResource("/MapStratIcon.png")));
                 repaint();
             } catch (IOException e) {
                 System.err.println("Failed to load image icon");

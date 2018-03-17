@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- JNLP File MapStrat client interface -->
+<jnlp
+  spec="6.0+"
+  codebase="http://mapgee.us/apps"
+  href="mapstrat.jnlp">
+  
+  <information>
+    <title>MapStrat</title>
+    <vendor>Theodore Sackos (mapgee.us)</vendor>
+    <homepage href="mapgee.us"/>
+    <description>Client interface for the MapStrat server to talk to.</description>
+    <icon href="res/MapStratIcon.png"/>
+    <offline-allowed/> 
+    <shortcut online="false" install="false">
+      <desktop/>
+      <menu submenu="MapStrat"/>
+    </shortcut>
+  </information>
+  
+  <security>
+      <all-permissions/>
+  </security>
+  <resources>
+    <j2se version="1.7+"/>
+    <jar href="MapStrat.jar"/>
+  </resources>
+  <application-desc main-class="MapStratClient"/>
+</jnlp> 
