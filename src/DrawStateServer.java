@@ -7,6 +7,7 @@ import util.GroupUtilities;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -60,19 +61,35 @@ public class DrawStateServer extends ServerSocket implements Runnable{
 
         private volatile boolean connected;
 
-        public ClientHandler(Socket c) throws IOException {
-            this.c   = c;
+        public ClientHandler(Socket c) {
+            this.c = c;
+        }
+
+        private void stopHandlingAndCleanup(Host client){
+            connected = false;
+            if(group != null) {
+                group.drop(client);
+
+                    /* If the group is empty, delete it and allow the state to be garbage collelcted. */
+                if (group.getNumPeers() == 0 && group.getGid() != null)
+                    sessions.remove(group.getGid());
+            }
         }
 
         @Override
         public void run(){
-            try{
+            try {
                 client = new Host(c);
                 connected = true;
                 handleClient();
-            }catch (IOException e){
-                e.printStackTrace();
-                System.exit(1);
+            } catch (SocketException e){
+                /* Connection can be reset, causing Message.get() to throw a socket exception. This is
+                 * caused by clients disconnecting abruptly. Drop the client, end this thread and remove
+                 * the client from its member group. */
+                System.err.println("ClientHandler for " + client + " received connection reset, dropping client.");
+                stopHandlingAndCleanup(client);
+            } catch (IOException e){
+                System.err.println("ClientHandler " + this.getId() + " failed to create the associated streams for the host.");
             }
         }
 
@@ -80,7 +97,7 @@ public class DrawStateServer extends ServerSocket implements Runnable{
             connected = false;
         }
 
-        private void handleClient() throws IOException {
+        private void handleClient() throws SocketException {
             while(connected){
                 Message m = Message.get(client);
                 if(m == null) {
@@ -93,10 +110,8 @@ public class DrawStateServer extends ServerSocket implements Runnable{
                 //System.err.printf("[Group %s]: Client handler received ", client.id);
                 switch(m.type){
                     case JOIN_GROUP:
-                        //System.err.println("JOIN_GROUP message");
-
                         /* Get the group ID that the client is trying to connect to */
-                        client.setGroup(GroupUtilities.groupNameFromId(m.gid));
+                        client.setGroup(m.getGroupId());
 
                         /* Check the group membership status */
                         String gid = client.id;
@@ -120,18 +135,21 @@ public class DrawStateServer extends ServerSocket implements Runnable{
                         group.refreshUnicast(client);
                         break;
                     case LEAVE_GROUP:
-                        //System.err.println("LEAVE_GROUP message");
                         /* Notify the client that they have left the group (numpeers = 0) */
                         Message.status(client.id, 0).send(client);
                         /* Remove the client from the group and close the connection */
-                        group.drop(client);
-                        break;
-                    case STATUS:
-                        //System.err.println("STATUS message");
+                        stopHandlingAndCleanup(client);
                         break;
                     case UPDATE:
-                        //System.err.println("UPDATE message");
+                        /* An update that was received from one host should be shared to all other hosts */
                         group.updateState(m.getStroke());
+                        break;
+
+                    case STATUS:
+                        System.err.println("STATUS message should not be sent to the server, outgoing only");
+                        break;
+                    case REFRESH:
+                        System.err.println("REFRESH message should not be sent to the server, outgoing only");
                         break;
                 }
             }

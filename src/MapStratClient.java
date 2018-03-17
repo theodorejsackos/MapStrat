@@ -37,9 +37,8 @@ public class MapStratClient {
 
         MapModel  mapModel     = new MapModel(MapModel.MAP_DEFAULT);
         DrawModel drawModel    = new DrawModel();
-        SessionModel seshModel = new SessionModel();
 
-        MapStratFrame window = new MapStratFrame(mapModel, drawModel, seshModel);
+        MapStratFrame window = new MapStratFrame(mapModel, drawModel);
         window.setVisible(true);
     }
 }

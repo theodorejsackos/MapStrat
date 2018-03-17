@@ -25,15 +25,15 @@ public class MapStratFrame extends JFrame {
 
     private static final int PREFERRED_CANVAS_SIZE = 800, PREFERRED_CONTROL_SIZE = 200;
 
-    private MenuBar menu;
+    private JMenuBar menu;
     private DrawingCanvas canvas;
     private ControlPanel  control;
 
-    public MapStratFrame(MapModel map, DrawModel draw, SessionModel sesh){
+    public MapStratFrame(MapModel map, DrawModel draw){
 
 
         /* Create the Menu Bar and the Session menu option */
-        menu = new MenuBar(sesh);
+        menu = new JMenuBar();
 
         /*menu = new JMenuBar();*/
         JMenu session = new JMenu("Session");

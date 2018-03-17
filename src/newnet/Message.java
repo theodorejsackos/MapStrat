@@ -5,6 +5,7 @@ import util.GroupUtilities;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.SocketException;
 import java.util.List;
 
 /** class Message --
@@ -68,7 +69,7 @@ public class Message implements Serializable {
         return m;
     }
 
-    public static Message get(Host from){
+    public static Message get(Host from) throws SocketException {
         try{
             Message m = (Message) from.ois.readObject();
             System.out.print("Message.get() from " + from + ":\n\t");
@@ -95,22 +96,6 @@ public class Message implements Serializable {
 
     public String getGroupId(){
         return GroupUtilities.groupNameFromId(gid);
-    }
-
-    public boolean isJoin(){
-        return type == MessageType.JOIN_GROUP;
-    }
-
-    public boolean isLeave(){
-        return type == MessageType.LEAVE_GROUP;
-    }
-
-    public boolean isUpdate(){
-        return type == MessageType.UPDATE;
-    }
-
-    public boolean isRefresh(){
-        return type == MessageType.REFRESH;
     }
 
     public DrawableObject getStroke(){

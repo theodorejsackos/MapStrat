@@ -7,6 +7,7 @@ import java.awt.*;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -120,13 +121,21 @@ public class DrawModel extends Observable {
     }
 
     public void disconnect(){
+        /* Disconnect with a separate thread, join() is blocking and shouldn't be done on the caller's
+         * thread, this may hang the GUI indeterminately. */
         new Thread(() -> {
-            serverHandler.stopRunning();
+            connected = false;
+            drawnObjects = new ArrayList<>(50);
+            setChanged();
+            notifyObservers();
+
             try {
                 serverHandler.join();
             }catch(InterruptedException e){
                 System.err.println("Interrupted while waiting for ServerHandler to join");
             }
+
+            serverHandler = null;
         }).start();
     }
 
@@ -143,7 +152,11 @@ public class DrawModel extends Observable {
         public void run(){
             System.err.println("Awaiting messages from server in ServerHandler");
             while(connected){
-                Message m = Message.get(server);
+                Message m = null;
+                try {
+                    m = Message.get(server);
+                }catch(SocketException e){/* If caught, then m will remain null and triggers the following check */}
+
                 if(m == null) {
                     System.err.println("Garbage message received from " + server + " severing connection.");
                     connected    = false;
@@ -153,40 +166,43 @@ public class DrawModel extends Observable {
                     continue;
                 }
 
-                //System.err.printf("[Group %s]: Server handler received ", gid);
                 switch(m.type){
-                    case JOIN_GROUP:
-                        //System.err.println("JOIN_GROUP message");
-                        break;
-                    case LEAVE_GROUP:
-                        //System.err.println("LEAVE_GROUP message");
-                        break;
                     case STATUS:
-                        //.err.println("STATUS message");
                         /* This is either the first response from the server or a generic 'we are still connected' message */
                         connected = true;
                         numPeers = m.getNumPeers();
                         break;
                     case UPDATE:
-                        //System.err.println("UPDATE message");
                         drawnObjects.add(m.getStroke());
                         setChanged();
                         notifyObservers();
                         break;
+                    case REFRESH:
+                        drawnObjects = m.getState();
+                        setChanged();
+                        notifyObservers();
+                        break;
+
+                    case JOIN_GROUP:
+                        System.err.println("JOIN_GROUP message should not be sent to the client, outgoing only");
+                        break;
+                    case LEAVE_GROUP:
+                        System.err.println("LEAVE_GROUP message should not be sent to the client, outgoing only");
+                        break;
                 }
             }
-        }
 
-        public void stopRunning(){
-            connected = false;
+            Message.leave(gid).send(server);
+
+            try {
+                server.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         public void updateServer(DrawableObject o){
             Message.update(gid, o).send(server);
-        }
-
-        public void refresh(){
-            Message.refresh(gid, null).send(server);
         }
     }
 }
