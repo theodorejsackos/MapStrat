@@ -2,6 +2,7 @@ package view;
 
 import model.DrawModel;
 import model.MapModel;
+import version.Version;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -172,7 +173,7 @@ public class ControlPanel extends JPanel implements Observer{
 
     public void initializeBadVersionIndicator(){
         badVersionIndicator = new JPanel(new GridLayout(2, 1));
-        badVersionIndicator.add(new JLabel("Bad version number: 1.0.1"));
+        badVersionIndicator.add(new JLabel("Bad version number: " + Version.VERSION));
         badVersionIndicator.add(new JLabel("Visit mapgee.us/ to update."));
         badVersionIndicator.setBackground(Color.red);
         badVersionIndicator.setVisible(false);
