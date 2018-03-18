@@ -36,6 +36,12 @@ public class GroupUtilities {
      * @return The valid group id string if it can be extracted from the inputGroup string, the empty string ("") if
      *         the inputGroup string was invalid. */
     public static String validateGroup(String inputGroup){
+        /* Input group cannot be shorter than the required length of a group ID (8), or greater than the length of the
+         * https address to website + length of group id (26). */
+        if(inputGroup.length() < 8 || inputGroup.length() > 26)
+            return "";
+
+
         if(inputGroup.length() == 8){
             for(char c : inputGroup.toCharArray()){
                 if(!Character.isLetterOrDigit(c))
@@ -44,6 +50,15 @@ public class GroupUtilities {
             return inputGroup;
         }
 
-        return "";//else if(inputGroup.contains("mapgee.us/"));
+        /* Longest first to avoid matching but not consuming everything */
+        final String[] acceptable = {"https://mapgee.us/", "http://mapgee.us/", "mapgee.us/"};
+
+        for(String prefix : acceptable) {
+            if(inputGroup.startsWith(prefix)){
+                return validateGroup(inputGroup.replace(prefix, "")); // Strip the prefix, check the group validity
+            }
+        }
+
+        return "";
     }
 }

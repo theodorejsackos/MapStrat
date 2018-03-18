@@ -70,9 +70,16 @@ public class DrawStateServer extends ServerSocket implements Runnable{
             if(group != null) {
                 group.drop(client);
 
-                    /* If the group is empty, delete it and allow the state to be garbage collelcted. */
-                if (group.getNumPeers() == 0 && group.getGid() != null)
-                    sessions.remove(group.getGid());
+                final String gid = group.getGid();
+
+                /* If the group is empty, delete it and allow the state to be garbage collelcted. */
+                if (group.getNumPeers() == 0 && gid != null) {
+                    group.reset();
+                    if(sessions.remove(gid, group))
+                        System.out.println("Stopping: Group empty, dropping group " + gid + " from sessions.");
+                    else
+                        System.out.println("Stopping: Group not empty: " + gid);
+                }
             }
         }
 
@@ -135,8 +142,8 @@ public class DrawStateServer extends ServerSocket implements Runnable{
                         group.refreshUnicast(client);
                         break;
                     case LEAVE_GROUP:
-                        /* Notify the client that they have left the group (numpeers = 0) */
-                        Message.status(client.id, 0).send(client);
+                        /* Echo the leave group back to the client */
+                        Message.leave(client.id).send(client);
                         /* Remove the client from the group and close the connection */
                         stopHandlingAndCleanup(client);
                         break;
@@ -144,7 +151,6 @@ public class DrawStateServer extends ServerSocket implements Runnable{
                         /* An update that was received from one host should be shared to all other hosts */
                         group.updateState(m.getStroke());
                         break;
-
                     case STATUS:
                         System.err.println("STATUS message should not be sent to the server, outgoing only");
                         break;

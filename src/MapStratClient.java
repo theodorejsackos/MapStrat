@@ -30,7 +30,7 @@ public class MapStratClient {
         }
     }
 
-    private static final boolean DEBUG_GUI_BOTTLENECKS = true;
+    private static final boolean DEBUG_GUI_BOTTLENECKS = false;
     public static void main(String[] args){
         if(DEBUG_GUI_BOTTLENECKS)
             /* Registers a new event queue that tracks how long each action in the queue takes to execute */

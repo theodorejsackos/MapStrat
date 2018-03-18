@@ -23,4 +23,22 @@ public class UtilTests {
             Assert.assertEquals(gid, groupIdFromName(groupNameFromId(gid)));
         }
     }
+
+    @Test
+    public void testGroupValidation(){
+        final String[] acceptable = {
+                "asdfzxcv", "https://mapgee.us/asdfzxcv", "http://mapgee.us/asdfzxcv",
+                "mapgee.us/asdfzxcv"
+        };
+
+        for(String input : acceptable)
+            Assert.assertEquals(acceptable[0], GroupUtilities.validateGroup(input));
+
+        final String[] unaccept = {
+                "", "asd", "asdfzxcvb", "https://mapgee.us/asd", "https://mapgee.us/asdfzxcvb", "mapgee.us/asdfzxcvb"
+        };
+
+        for(String input : unaccept)
+            Assert.assertEquals(unaccept[0], GroupUtilities.validateGroup(input));
+    }
 }

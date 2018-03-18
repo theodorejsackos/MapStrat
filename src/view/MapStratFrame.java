@@ -5,6 +5,7 @@ import controller.MapMoveListener;
 import controller.MapScrollListener;
 import model.DrawModel;
 import model.MapModel;
+import newnet.Message;
 import util.GroupUtilities;
 
 import javax.imageio.ImageIO;
@@ -72,33 +73,49 @@ public class MapStratFrame extends JFrame {
             HintTextField group  = new HintTextField("https://mapgee.us/GROUP_ID");
 
             /* Create a custom query panel to display on the prompted dialog */
-            JPanel querier = new JPanel(new GridLayout(5, 1));
-            querier.add(new JLabel("Enter a group invite link or group ID. They will look something like:"));
+            JPanel querier = new JPanel(new GridLayout(7, 1));
+            JLabel prompt = new JLabel("Enter a group invite link or group ID. They will look something like:");
+            querier.add(prompt);
+            querier.add(new JLinkLabel("https://mapgee.us/jAbfHa"));
+            querier.add(new JLinkLabel("http://mapgee.us/jAbfHa"));
             querier.add(new JLinkLabel("mapgee.us/jAbfHa"));
             querier.add(new JLinkLabel("jAbfHa"));
             querier.add(Box.createVerticalStrut(5));
             querier.add(group);
 
-            /* Show the dialog, if the user clicks the "OK" button, do error checking, if the input passes, attempt
-             * to connect to the specified group on the mapgee.us server */
-            int result = JOptionPane.showConfirmDialog(null, querier, "Connect to a group on a server", JOptionPane.OK_CANCEL_OPTION);
-            if (result == JOptionPane.OK_OPTION) {
-                int    port = 8080;
-                String gid  = group.getText();
+            String  gid;
+            String  validation;
+            boolean invalid;
+            int     dialogSelection;
 
-                /* Check if the string supplied is valid, if so connect */
-                if(GroupUtilities.groupValid(gid)) {
-                    draw.connect(port, gid);
-                    leave.setEnabled(true);
-                    join.setEnabled(false);
-                }
+            dialogSelection = JOptionPane.showConfirmDialog(null, querier, "Connect to a group on a server", JOptionPane.OK_CANCEL_OPTION);
+            gid        = group.getText();
+            validation = GroupUtilities.validateGroup(gid);
+            invalid    = validation.equals("");
+            prompt.setText("<html><font color='red'>That group ID link was not valid. This is what valid links look like:</font></html>");
+
+            while (dialogSelection == JOptionPane.OK_OPTION && invalid) {
+                group.setText(""); // Clear the old input from the hint text field (thus revealing the hint again)
+                dialogSelection = JOptionPane.showConfirmDialog(null, querier, "Connect to a group on a server", JOptionPane.OK_CANCEL_OPTION);
+
+                gid        = group.getText();
+                validation = GroupUtilities.validateGroup(gid);
+                invalid    = validation.equals("");
+
+            }
+
+            if(dialogSelection == JOptionPane.OK_OPTION){
+                int    port = 8080;
+                draw.connect(port, gid);
+                leave.setEnabled(true);
+                join.setEnabled(false);
             }
         });
 
         leave.addActionListener((ActionEvent e) -> {
+            draw.disconnect();
             leave.setEnabled(false);
             join.setEnabled(true);
-            draw.disconnect();
         });
     }
 
@@ -131,6 +148,10 @@ public class MapStratFrame extends JFrame {
         }
 
         this.pack();
+
+        /* Center the frame on the main screen */
+        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+        this.setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
     }
 
     private void initializeWindowListeners(MapModel map, DrawModel draw){

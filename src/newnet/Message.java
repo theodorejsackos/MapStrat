@@ -3,6 +3,7 @@ package newnet;
 import model.DrawableObject;
 import util.GroupUtilities;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.SocketException;
@@ -77,7 +78,7 @@ public class Message implements Serializable {
             System.out.flush();
             return m;
         } catch (IOException | ClassNotFoundException e){
-            e.printStackTrace();
+            System.err.println(e.getClass() + ": in get()");
             return null;
         }
     }

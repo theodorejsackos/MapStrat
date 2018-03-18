@@ -53,4 +53,11 @@ public class Group {
             Message.update(gid, o).send(client);
         }
     }
+
+    public void reset(){
+        while(clients.size() > 0)
+            clients.remove(0);
+        while(state.size() > 0)
+            state.remove(0);
+    }
 }

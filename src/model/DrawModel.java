@@ -124,11 +124,10 @@ public class DrawModel extends Observable {
         /* Disconnect with a separate thread, join() is blocking and shouldn't be done on the caller's
          * thread, this may hang the GUI indeterminately. */
         new Thread(() -> {
-            connected = false;
-            drawnObjects = new ArrayList<>(50);
-            setChanged();
-            notifyObservers();
+            /* Send leave message to server, eventually the server should echo the leave back to this handler */
+            serverHandler.leave();
 
+            /* Wait for the echo to come back and for the serverHandler thread to die */
             try {
                 serverHandler.join();
             }catch(InterruptedException e){
@@ -136,6 +135,8 @@ public class DrawModel extends Observable {
             }
 
             serverHandler = null;
+            setChanged();
+            notifyObservers();
         }).start();
     }
 
@@ -151,6 +152,8 @@ public class DrawModel extends Observable {
         @Override
         public void run(){
             System.err.println("Awaiting messages from server in ServerHandler");
+
+            acceptLoop:
             while(connected){
                 Message m = null;
                 try {
@@ -159,6 +162,7 @@ public class DrawModel extends Observable {
 
                 if(m == null) {
                     System.err.println("Garbage message received from " + server + " severing connection.");
+                    numPeers     = 0;
                     connected    = false;
                     drawnObjects = new ArrayList<>();
                     setChanged();
@@ -187,12 +191,14 @@ public class DrawModel extends Observable {
                         System.err.println("JOIN_GROUP message should not be sent to the client, outgoing only");
                         break;
                     case LEAVE_GROUP:
-                        System.err.println("LEAVE_GROUP message should not be sent to the client, outgoing only");
-                        break;
+                        /* Reset all state */
+                        numPeers     = 0;
+                        connected    = false;
+                        drawnObjects = new ArrayList<>(50);
+                        System.out.println("Left group, handler thread dying");
+                        break acceptLoop;
                 }
             }
-
-            Message.leave(gid).send(server);
 
             try {
                 server.close();
@@ -203,6 +209,10 @@ public class DrawModel extends Observable {
 
         public void updateServer(DrawableObject o){
             Message.update(gid, o).send(server);
+        }
+
+        public void leave(){
+            Message.leave(gid).send(server);
         }
     }
 }
