@@ -29,4 +29,21 @@ public class GroupUtilities {
         }
         return gid;
     }
+
+    /**
+     *
+     * @param inputGroup The string the user entered in the prompt to join a group. This string may or may not be valid
+     * @return The valid group id string if it can be extracted from the inputGroup string, the empty string ("") if
+     *         the inputGroup string was invalid. */
+    public static String validateGroup(String inputGroup){
+        if(inputGroup.length() == 8){
+            for(char c : inputGroup.toCharArray()){
+                if(!Character.isLetterOrDigit(c))
+                    return "";
+            }
+            return inputGroup;
+        }
+
+        return "";//else if(inputGroup.contains("mapgee.us/"));
+    }
 }

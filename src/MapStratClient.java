@@ -30,7 +30,7 @@ public class MapStratClient {
         }
     }
 
-    private static final boolean DEBUG_GUI_BOTTLENECKS = false;
+    private static final boolean DEBUG_GUI_BOTTLENECKS = true;
     public static void main(String[] args){
         if(DEBUG_GUI_BOTTLENECKS)
             /* Registers a new event queue that tracks how long each action in the queue takes to execute */
@@ -42,17 +42,8 @@ public class MapStratClient {
                 /* Use the current OS's Look and feel */
         try{
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        }catch (UnsupportedLookAndFeelException e) {
-            // handle exception
-        }
-        catch (ClassNotFoundException e) {
-            // handle exception
-        }
-        catch (InstantiationException e) {
-            // handle exception
-        }
-        catch (IllegalAccessException e) {
-            // handle exception
+        } catch (Exception e) {
+            /* Default to the Java look and feel */;
         }
 
         MapStratFrame window = new MapStratFrame(mapModel, drawModel);

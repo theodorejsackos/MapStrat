@@ -3,11 +3,11 @@ package view;
 import javax.swing.*;
 import java.awt.*;
 
-public class GroupTextField extends JTextField {
+public class HintTextField extends JTextField {
 
     private final String hint;
 
-    public GroupTextField(String hint){
+    public HintTextField(String hint){
         super();
         this.hint = hint;
     }
