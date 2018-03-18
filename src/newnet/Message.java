@@ -2,6 +2,7 @@ package newnet;
 
 import model.DrawableObject;
 import util.GroupUtilities;
+import version.Version;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -23,9 +24,12 @@ public class Message implements Serializable {
     public final long        gid;
 
     /* State information, may be null and unused */
-    private List<DrawableObject> state;     // For updating a client's state
-    private DrawableObject       newStroke; // For adding to the server's state
-    private int                  numPeers;  // For status update messages (session/group information).
+    private List<DrawableObject> state;     //  For updating a client's state
+    private DrawableObject       newStroke; //  For adding to the server's state
+    private int                  numPeers;  //  For STATUS update messages (session/group information).
+    private String               version;   //  For STATUS update to share the current server version with clients. This
+                                            // allows clients to be informed when their version is out of date and needs
+                                            // to be re-downloaded
 
     private Message(MessageType t, long gid){
         this.type = t;
@@ -55,6 +59,7 @@ public class Message implements Serializable {
     public static Message status(long group, int numPeers){
         Message m  = new Message(MessageType.STATUS, group);
         m.numPeers = numPeers;
+        m.version  = Version.VERSION;
         return m;
     }
 
@@ -107,6 +112,11 @@ public class Message implements Serializable {
 
     public int getNumPeers(){
         return numPeers;
+    }
+
+
+    public String getVersion() {
+        return version;
     }
 
     public List<DrawableObject> getState() {

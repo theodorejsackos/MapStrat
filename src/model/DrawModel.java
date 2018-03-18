@@ -2,6 +2,7 @@ package model;
 
 import newnet.Host;
 import newnet.Message;
+import version.Version;
 
 import java.awt.*;
 import java.io.IOException;
@@ -33,6 +34,8 @@ public class DrawModel extends Observable {
     private volatile boolean connected  = false;
     private ServerHandler serverHandler = null;
     private int           numPeers      = 0;
+
+    private String badVersion = null;
 
     /* Default initialize a larger than normal list of drawable objects, the color to red, and the
      * brush size to 1px */
@@ -69,6 +72,10 @@ public class DrawModel extends Observable {
     /* Returns the current state of the size of the brush */
     public int getSize(){
         return this.selectedSize;
+    }
+
+    public String getBadVersion(){
+        return badVersion;
     }
 
     /* Begin drawing a stroke by creating a new LineStroke object, add that reference exactly once to
@@ -175,6 +182,11 @@ public class DrawModel extends Observable {
                         /* This is either the first response from the server or a generic 'we are still connected' message */
                         connected = true;
                         numPeers = m.getNumPeers();
+                        final String version = m.getVersion();
+                        if(!Version.validateVersion(version)){
+                            badVersion = version;
+                            disconnect();
+                        }
                         break;
                     case UPDATE:
                         drawnObjects.add(m.getStroke());

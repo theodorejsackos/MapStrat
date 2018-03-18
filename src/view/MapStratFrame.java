@@ -7,6 +7,7 @@ import model.DrawModel;
 import model.MapModel;
 import newnet.Message;
 import util.GroupUtilities;
+import version.Version;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -117,6 +118,28 @@ public class MapStratFrame extends JFrame {
             leave.setEnabled(false);
             join.setEnabled(true);
         });
+
+        JMenu help = new JMenu("Help");
+        JMenuItem about = new JMenuItem("About");
+        about.addActionListener((ActionEvent e) -> {
+            JPanel aboutPanel = new JPanel(new BorderLayout());
+
+            ImageIcon icon = new ImageIcon(getClass().getResource("/full_icon.png"));
+            aboutPanel.add(new JLabel(icon), BorderLayout.CENTER);
+
+            JLabel version = new JLabel("MapStrat Version: " + Version.VERSION);
+            version.setHorizontalAlignment(JLabel.CENTER);
+            aboutPanel.add(version, BorderLayout.NORTH);
+
+            aboutPanel.add(
+                    new JLabel("For more information or to download the latest version, visit http://mapstrat.us"),
+                    BorderLayout.SOUTH
+            );
+
+            JOptionPane.showConfirmDialog(null, aboutPanel, "About MapStrat", JOptionPane.OK_CANCEL_OPTION);
+        });
+        help.add(about);
+        menu.add(help);
     }
 
     private void initializeCanvas(MapModel map, DrawModel draw){
