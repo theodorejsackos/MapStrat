@@ -12,7 +12,6 @@
     <div class="bubble" id="nav">
     <ul>
         <li class="highlight"> <a href="index.html"> MapStrat </a>
-        <li class="highlight"> <a href="explore.html">  &nbsp;&nbsp; Explore </a>
         <li class="highlight"> <a href="download.html"> &nbsp;&nbsp; Download </a>
     </ul>
 
@@ -22,22 +21,33 @@
     </div>
 
     <div class="content">
-        <div class="banner bubble">
+        <div class="banner bubble"> 
             <h1> MapStrat </h1>
             <p>  Think more, win more. </p>
         </div>
         <h2> Installation Instructions </h2>
         <p> MapStrat is implemented as a Java Swing application. It is distributed in a variety of ways. </p>
         <h2> Pick your flavor </h2>
+        
         <ul>
+            <!--
             <li> <h3> Launch MapStrat from your browser using Java Web Start </h3> 
                  <div id="launch_jws">
-                    <p> Click <a href="mapstrat.jnlp"> here </a> to launch the client interface using JWS. </p>
+                    <p> Click <a href="apps/mapstrat.jnlp" class="inpage-link">here</a> to launch the client interface using JWS. </p>
                     <p> This is the appropriate option if you already have Java 7 or higher installed and don't want to do any setup </p>
                  </div>
+            </li> 
+            -->
+            <li> 
+                <h3> Download the MapStrat <a href="apps/MapStrat.jar" class="inpage-link" download>executable .jar file</a> and run from there </h3> 
+                <p>  Keep track of where the .jar file is located. If you already have Java 8+ installed, you can double click this .jar file to
+                     run MapStrat.
+                <h3> Testing Java Version </h3>
+                <ul>
+                <li> For Windows users, open a cmd prompt by clicking the start menu and typing "cmd". Run the command <code>java -version</code>. </li>
+                <li> If the version number is lower than 1.8.0 please visit <a href="https://www.java.com/en/download/"> The Java download page </a>. </li>
+                </ul>
             </li>
-            <li> <h3> Download the MapStrat executable .jar file and run from there </h3> </li>
-            <li> <h3> Download and install the MapStrat client, run as a normal desktop application </h3> </li>
         </ul>
     </div>
 
